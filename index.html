@@ -22,8 +22,15 @@
         <a class="btn btn-ghost" href="assets/wesee-whitepaper-v0.1.pdf" target="_blank" rel="noopener">
           Download Whitepaper
         </a>
+
+        <!-- Web3 button (we'll update its text after connect) -->
         <button class="btn btn-primary" id="connectBtn" type="button">
           Connect Wallet
+        </button>
+
+        <!-- Disconnect (hidden until connected) -->
+        <button class="btn btn-ghost" id="disconnectBtn" type="button" style="display:none;">
+          Disconnect
         </button>
       </nav>
     </div>
@@ -71,9 +78,9 @@
           </div>
 
           <div class="field">
-            <label for="WESEEAmount">You receive</label>
+            <label for="weseeAmount">You receive</label>
             <div class="input-row">
-              <input id="WESEEAmount" disabled placeholder="0.00" />
+              <input id="weseeAmount" disabled placeholder="0.00" />
               <div class="token-chip">
                 <span class="token-dot wesee"></span>
                 <span>WESEE</span>
@@ -106,7 +113,7 @@
           </div>
 
           <div class="note">
-            <b>Note:</b> This page is UI-only for now. On-chain purchase will be enabled after contracts are deployed.
+            <b>Note:</b> Wallet connection is enabled. On-chain purchase will be enabled after contracts are deployed.
           </div>
         </div>
       </div>
@@ -143,9 +150,8 @@
         <div class="divider"></div>
 
         <div class="small">
-          After deployment, this page will:
+          Next steps after deployment:
           <ul>
-            <li>connect MetaMask</li>
             <li>approve USDT</li>
             <li>buy WESEE via sale contract</li>
           </ul>
@@ -163,6 +169,7 @@
     </footer>
   </main>
 
+  <!-- App JS -->
   <script src="app.js"></script>
 </body>
 </html>
