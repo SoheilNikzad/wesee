@@ -13,10 +13,13 @@
   --bad: #ff4d4d;
 }
 
+/* ====== GLOBAL HARDENING (prevents overflow on iOS) ====== */
 *{ box-sizing: border-box; }
 html,body{ height: 100%; }
+html { overflow-x: hidden; }
 body{
   margin:0;
+  overflow-x: hidden; /* <- key for iOS */
   font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
   background: radial-gradient(1200px 600px at 20% -10%, rgba(255,122,24,.18), transparent 60%),
               radial-gradient(900px 500px at 80% 0%, rgba(46,229,157,.10), transparent 55%),
@@ -24,11 +27,28 @@ body{
   color: var(--text);
 }
 
+/* Any flex child must be allowed to shrink */
+.input-row > *,
+.list-row > *,
+.summary-row > *{
+  min-width: 0;
+}
+
+/* Long texts should wrap instead of pushing layout */
+.list-row b,
+.summary-row b,
+.field-hint b,
+.rate-badge{
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
 .container{
   width: min(1080px, calc(100% - 40px));
   margin: 0 auto;
 }
 
+/* ====== TOPBAR ====== */
 .topbar{
   position: sticky;
   top: 0;
@@ -67,8 +87,10 @@ body{
   display:flex;
   align-items:center;
   gap: 10px;
+  flex-wrap: wrap;
 }
 
+/* ====== BUTTONS ====== */
 .btn{
   border: 1px solid transparent;
   border-radius: 12px;
@@ -78,6 +100,7 @@ body{
   letter-spacing: .2px;
   transition: transform .06s ease, opacity .12s ease, border-color .12s ease, background .12s ease;
   user-select:none;
+  max-width: 100%;
 }
 .btn:active{ transform: translateY(1px); }
 .btn:disabled{ opacity: .5; cursor:not-allowed; }
@@ -98,6 +121,7 @@ body{
   background: rgba(255,255,255,.04);
 }
 
+/* ====== HERO ====== */
 .hero{
   padding: 34px 0 16px;
 }
@@ -120,8 +144,10 @@ body{
   border: 1px solid rgba(255,255,255,.10);
   background: rgba(255,255,255,.03);
   color: var(--text);
+  max-width: 100%;
 }
 
+/* ====== GRID ====== */
 .grid{
   display:grid;
   grid-template-columns: 1.2fr .8fr;
@@ -133,12 +159,14 @@ body{
   .brand{ min-width: auto; }
 }
 
+/* ====== CARD ====== */
 .card{
   background: linear-gradient(180deg, rgba(255,255,255,.03), transparent 35%), var(--card);
   border: 1px solid rgba(255,255,255,.08);
   border-radius: var(--radius);
   box-shadow: var(--shadow);
   padding: 18px;
+  max-width: 100%;
 }
 
 .card-header{
@@ -165,8 +193,11 @@ body{
   border-radius: 999px;
   border: 1px solid rgba(255,255,255,.10);
   background: rgba(255,255,255,.03);
+  max-width: 100%;
+  white-space: normal; /* <- allow wrap */
 }
 
+/* ====== SWAP ====== */
 .swap{
   margin-top: 12px;
 }
@@ -182,6 +213,7 @@ label{
   margin-bottom: 8px;
 }
 
+/* input row needs to allow children shrink */
 .input-row{
   display:flex;
   align-items:center;
@@ -190,10 +222,15 @@ label{
   border: 1px solid rgba(255,255,255,.10);
   border-radius: 14px;
   padding: 12px;
+  max-width: 100%;
+  overflow: hidden; /* <- prevents chip from spilling on iOS */
 }
 
+/* Critical iOS fix: input must be allowed to shrink */
 input{
-  flex: 1;
+  flex: 1 1 auto;
+  width: 0;          /* <- key: avoid min-content overflow */
+  min-width: 0;      /* <- key */
   border: none;
   outline: none;
   background: transparent;
@@ -206,6 +243,7 @@ input::placeholder{ color: rgba(230,237,247,.22); }
 input:disabled{ opacity: .85; }
 
 .token-chip{
+  flex: 0 0 auto;
   display:flex;
   align-items:center;
   gap: 8px;
@@ -215,13 +253,15 @@ input:disabled{ opacity: .85; }
   border-radius: 999px;
   font-weight: 900;
   font-size: 13px;
+  white-space: nowrap;
+  max-width: 50%;
 }
 
 .token-dot{
   width: 10px; height: 10px; border-radius: 50%;
 }
 .token-dot.usdt{ background: #2ee59d; }
-.token-dot.WESEE{ background: var(--accent); }
+.token-dot.wesee{ background: var(--accent); }
 
 .field-hint{
   margin-top: 8px;
@@ -259,12 +299,15 @@ input:disabled{ opacity: .85; }
   font-weight: 900;
 }
 
+/* ====== SUMMARY ====== */
 .summary{
   margin-top: 12px;
   border: 1px solid rgba(255,255,255,.08);
   border-radius: 14px;
   background: rgba(255,255,255,.02);
   padding: 12px;
+  max-width: 100%;
+  overflow: hidden;
 }
 .summary-row{
   display:flex;
@@ -273,6 +316,7 @@ input:disabled{ opacity: .85; }
   padding: 8px 2px;
   border-bottom: 1px solid rgba(255,255,255,.06);
   color: var(--muted);
+  gap: 10px;
 }
 .summary-row b{ color: var(--text); }
 .summary-row:last-child{ border-bottom: none; }
@@ -300,6 +344,7 @@ input:disabled{ opacity: .85; }
   padding-top: 12px;
 }
 
+/* ====== DETAILS LIST ====== */
 .list{
   margin-top: 12px;
 }
@@ -311,7 +356,10 @@ input:disabled{ opacity: .85; }
   border-bottom: 1px solid rgba(255,255,255,.06);
   color: var(--muted);
 }
-.list-row b{ color: var(--text); }
+.list-row b{
+  color: var(--text);
+  text-align: right;
+}
 .list-row:last-child{ border-bottom: none; }
 
 .divider{
@@ -327,6 +375,7 @@ input:disabled{ opacity: .85; }
 }
 .small ul{ margin: 8px 0 0 18px; }
 
+/* ====== FOOTER ====== */
 .footer{
   display:flex;
   justify-content:space-between;
@@ -345,173 +394,69 @@ input:disabled{ opacity: .85; }
 .footer-link:hover{ text-decoration: underline; }
 
 /* =========================
-   RESPONSIVE – MOBILE FIRST
+   RESPONSIVE – MOBILE
    ========================= */
-
 @media (max-width: 640px) {
 
-  /* جلوگیری از اسکرول افقی */
-  html, body {
-    overflow-x: hidden;
-  }
-
-  .container {
+  .container{
     width: calc(100% - 24px);
   }
 
-  /* ---------- Header ---------- */
-  .topbar-inner {
+  /* Header */
+  .topbar-inner{
     flex-direction: column;
     align-items: flex-start;
     gap: 12px;
   }
-
-  .topbar-actions {
+  .topbar-actions{
     width: 100%;
     justify-content: space-between;
   }
-
-  .btn {
+  .btn{
     padding: 10px 12px;
     font-size: 14px;
   }
 
-  /* ---------- Hero ---------- */
-  .hero h1 {
-    font-size: 26px;
-  }
+  /* Hero */
+  .hero{ padding: 26px 0 10px; }
+  .hero h1{ font-size: 26px; }
+  .hero p{ font-size: 14px; }
 
-  .hero p {
-    font-size: 14px;
-  }
-
-  /* ---------- Grid ---------- */
-  .grid {
-    grid-template-columns: 1fr;
-    gap: 14px;
-  }
-
-  /* ---------- Cards ---------- */
-  .card {
-    padding: 14px;
-  }
-
-  .card-title {
-    font-size: 16px;
-  }
-
-  .card-subtitle {
-    font-size: 12px;
-  }
-
-  .card-header {
+  /* Cards */
+  .card{ padding: 14px; }
+  .card-header{
     flex-direction: column;
     align-items: flex-start;
     gap: 8px;
   }
+  .rate-badge{ font-size: 11px; padding: 5px 8px; }
 
-  .rate-badge {
-    font-size: 11px;
-    padding: 5px 8px;
-  }
+  /* Inputs */
+  .input-row{ padding: 10px; gap: 8px; }
+  input{ font-size: 18px; }
+  .token-chip{ font-size: 12px; padding: 6px 8px; max-width: 52%; }
 
-  /* ---------- Inputs ---------- */
-  .input-row {
-    padding: 10px;
-    gap: 8px;
-  }
-
-  input {
-    font-size: 18px;
-  }
-
-  .token-chip {
-    font-size: 12px;
-    padding: 6px 8px;
-  }
-
-  /* ---------- Swap ---------- */
-  .swap-divider {
-    margin: 2px 0;
-  }
-
-  .swap-icon {
-    width: 34px;
-    height: 34px;
-    font-size: 14px;
-  }
-
-  /* ---------- Summary ---------- */
-  .summary {
-    padding: 10px;
-  }
-
-  .summary-row {
-    font-size: 13px;
-  }
-
-  /* ---------- Buttons ---------- */
-  .btn-wide {
-    font-size: 14px;
-    padding: 12px;
-  }
-
-  /* ---------- Footer ---------- */
-  .footer {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
-  }
-
-  .footer-link {
-    font-size: 13px;
-  }
-}
-
-.input-row > * { min-width: 0; }
-.list-row > * { min-width: 0; }
-.summary-row > * { min-width: 0; }
-
-.list-row b,
-.summary-row b,
-.field-hint b {
-  overflow-wrap: anywhere;
-  word-break: break-word;
-}
-
-.token-chip{
-  flex-shrink: 0;
-  max-width: 45%;
-  white-space: nowrap;
-}
-
-.rate-badge{
-  max-width: 100%;
-  white-space: normal;
-  overflow-wrap: anywhere;
-}
-
-
-@media (max-width: 640px) {
-
+  /* Details rows: stack (prevents right side clipping) */
   .list-row{
     flex-direction: column;
     align-items: flex-start;
     gap: 6px;
   }
-
   .list-row b{
     text-align: left;
     width: 100%;
   }
 
-  /* Summary rows: allow wrap */
-  .summary-row{
-    gap: 10px;
+  /* Summary values: keep inside */
+  .summary-row b{
+    max-width: 58%;
+    text-align: right;
   }
 
-  .summary-row b{
-    text-align: right;
-    max-width: 55%;
+  /* Footer */
+  .footer{
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
   }
 }
