@@ -343,3 +343,127 @@ input:disabled{ opacity: .85; }
   font-weight: 900;
 }
 .footer-link:hover{ text-decoration: underline; }
+
+/* =========================
+   RESPONSIVE – MOBILE FIRST
+   ========================= */
+
+@media (max-width: 640px) {
+
+  /* جلوگیری از اسکرول افقی */
+  html, body {
+    overflow-x: hidden;
+  }
+
+  .container {
+    width: calc(100% - 24px);
+  }
+
+  /* ---------- Header ---------- */
+  .topbar-inner {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .topbar-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .btn {
+    padding: 10px 12px;
+    font-size: 14px;
+  }
+
+  /* ---------- Hero ---------- */
+  .hero h1 {
+    font-size: 26px;
+  }
+
+  .hero p {
+    font-size: 14px;
+  }
+
+  /* ---------- Grid ---------- */
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  /* ---------- Cards ---------- */
+  .card {
+    padding: 14px;
+  }
+
+  .card-title {
+    font-size: 16px;
+  }
+
+  .card-subtitle {
+    font-size: 12px;
+  }
+
+  .card-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .rate-badge {
+    font-size: 11px;
+    padding: 5px 8px;
+  }
+
+  /* ---------- Inputs ---------- */
+  .input-row {
+    padding: 10px;
+    gap: 8px;
+  }
+
+  input {
+    font-size: 18px;
+  }
+
+  .token-chip {
+    font-size: 12px;
+    padding: 6px 8px;
+  }
+
+  /* ---------- Swap ---------- */
+  .swap-divider {
+    margin: 2px 0;
+  }
+
+  .swap-icon {
+    width: 34px;
+    height: 34px;
+    font-size: 14px;
+  }
+
+  /* ---------- Summary ---------- */
+  .summary {
+    padding: 10px;
+  }
+
+  .summary-row {
+    font-size: 13px;
+  }
+
+  /* ---------- Buttons ---------- */
+  .btn-wide {
+    font-size: 14px;
+    padding: 12px;
+  }
+
+  /* ---------- Footer ---------- */
+  .footer {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .footer-link {
+    font-size: 13px;
+  }
+}
