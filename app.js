@@ -1,212 +1,68 @@
-(() => {
-  // ==========================
-  // UI CONFIG (demo)
-  // ==========================
-  const TOTAL_SUPPLY = 50000; // WESEE
-  const PRICE_USDT_PER_WESEE = 1; // fixed: 1 USDT = 1 WESEE
-  const MIN_BUY_USDT = 1;
+import { createAppKit } from "https://cdn.jsdelivr.net/npm/@reown/appkit@1.7.7/+esm";
+import { EthersAdapter } from "https://cdn.jsdelivr.net/npm/@reown/appkit-adapter-ethers@1.7.7/+esm";
+import { bsc } from "https://cdn.jsdelivr.net/npm/@reown/appkit/networks@1.7.7/+esm";
 
-  // Web3 (Reown AppKit) Config
-  const REOWN_PROJECT_ID = "6cd9185e9e8517c636ebaff85041eaf4";
-  const APP_NAME = "WeSee";
-  const APP_DESCRIPTION = "Fixed price token sale";
-  const APP_URL = "https://wesee.info";
-  // simple icon (optional); you can put a real icon later
-  const APP_ICONS = ["https://wesee.info/assets/wesee-icon.png"];
+const PROJECT_ID = "6cd9185e9e8517c636ebaff85041eaf4";
 
-  // In UI-only mode, we simulate remaining/sold in-memory.
-  let sold = 0;
+const connectBtn = document.getElementById("connectBtn");
+const disconnectBtn = document.getElementById("disconnectBtn");
 
-  // ==========================
-  // ELEMENTS
-  // ==========================
-  const usdtInput = document.getElementById("usdtAmount");
-  const weseeInput = document.getElementById("weseeAmount");
-  const remainingText = document.getElementById("remainingText");
-  const soldText = document.getElementById("soldText");
-  const statusText = document.getElementById("statusText");
-  const buyBtn = document.getElementById("buyBtn");
-  const maxBtn = document.getElementById("maxBtn");
-  const maxHint = document.getElementById("maxHint");
-  const connectBtn = document.getElementById("connectBtn");
-  const disconnectBtn = document.getElementById("disconnectBtn");
-  const yearEl = document.getElementById("year");
+let appKit;
+let initialized = false;
 
-  yearEl.textContent = new Date().getFullYear();
+function shortAddr(addr) {
+  return addr.slice(0, 6) + "…" + addr.slice(-4);
+}
 
-  // ==========================
-  // HELPERS
-  // ==========================
-  const formatNumber = (n) =>
-    new Intl.NumberFormat("en-US", { maximumFractionDigits: 2 }).format(n);
+async function initWallet() {
+  if (initialized) return;
 
-  const shortAddr = (addr) => {
-    if (!addr || typeof addr !== "string") return "";
-    return `${addr.slice(0, 6)}…${addr.slice(-4)}`;
-    };
+  appKit = createAppKit({
+    projectId: PROJECT_ID,
+    adapters: [new EthersAdapter()],
+    networks: [bsc],
+    metadata: {
+      name: "WeSee",
+      description: "WeSee token sale",
+      url: "https://www.wesee.info",
+      icons: ["https://www.wesee.info/favicon.ico"],
+    },
+  });
 
-  const remaining = () => Math.max(0, TOTAL_SUPPLY - sold);
+  initialized = true;
 
-  const setStatus = (type, text) => {
-    statusText.classList.remove("neutral", "good", "bad");
-    statusText.classList.add(type);
-    statusText.textContent = text;
-  };
-
-  const sanitizeAmount = (raw) => {
-    if (typeof raw !== "string") return "";
-    const cleaned = raw.replace(/[^\d.]/g, "");
-    const parts = cleaned.split(".");
-    if (parts.length <= 2) return cleaned;
-    return parts[0] + "." + parts.slice(1).join("");
-  };
-
-  const parseAmount = (raw) => {
-    const v = Number(raw);
-    return Number.isFinite(v) ? v : 0;
-  };
-
-  const recalc = () => {
-    const cleaned = sanitizeAmount(usdtInput.value);
-    if (cleaned !== usdtInput.value) usdtInput.value = cleaned;
-
-    const usdt = parseAmount(cleaned);
-    const outWESEE = usdt / PRICE_USDT_PER_WESEE;
-
-    weseeInput.value = cleaned ? formatNumber(outWESEE) : "";
-
-    remainingText.textContent = `${formatNumber(remaining())} WESEE`;
-    soldText.textContent = `${formatNumber(sold)} WESEE`;
-    maxHint.textContent = formatNumber(remaining());
-
-    if (!cleaned || usdt === 0) {
-      buyBtn.disabled = true;
-      setStatus("neutral", "Ready");
-      return;
-    }
-    if (usdt < MIN_BUY_USDT) {
-      buyBtn.disabled = true;
-      setStatus("bad", `Minimum is ${MIN_BUY_USDT} USDT`);
-      return;
-    }
-    if (outWESEE > remaining()) {
-      buyBtn.disabled = true;
-      setStatus("bad", "Amount exceeds remaining supply");
-      return;
-    }
-
-    buyBtn.disabled = false;
-    setStatus("good", "Valid amount");
-  };
-
-  // ==========================
-  // WEB3: Reown AppKit (WalletConnect)
-  // ==========================
-  // We load AppKit via ESM from CDN (works on GitHub Pages).
-  // If your environment blocks ESM, tell me and we'll switch.
-  let appKit = null;
-  let connectedAddress = null;
-
-  const setConnectedUI = (address) => {
-    connectedAddress = address;
-    connectBtn.textContent = shortAddr(address);
+  // restore session
+  const state = appKit.getState();
+  if (state?.address) {
+    connectBtn.textContent = shortAddr(state.address);
     disconnectBtn.style.display = "inline-block";
-  };
+  }
 
-  const setDisconnectedUI = () => {
-    connectedAddress = null;
-    connectBtn.textContent = "Connect Wallet";
-    disconnectBtn.style.display = "none";
-  };
-
-  const ensureAppKit = async () => {
-    if (appKit) return appKit;
-
-    // Dynamically import Reown AppKit (ESM)
-    const [{ createAppKit }, { mainnet, bsc }] = await Promise.all([
-      import("https://unpkg.com/@reown/appkit@1.7.7/dist/index.js"),
-      import("https://unpkg.com/@reown/appkit/networks/dist/index.js"),
-    ]);
-
-    // We want BSC as primary target.
-    appKit = createAppKit({
-      projectId: REOWN_PROJECT_ID,
-      networks: [bsc, mainnet],
-      metadata: {
-        name: APP_NAME,
-        description: APP_DESCRIPTION,
-        url: APP_URL,
-        icons: APP_ICONS,
-      },
-    });
-
-    // Try restore session (if previously connected)
-    const state = appKit.getState?.();
-    const addr = state?.address;
-    if (addr) setConnectedUI(addr);
-
-    // Listen for state changes (connect/disconnect)
-    if (appKit.subscribeState) {
-      appKit.subscribeState((s) => {
-        if (s?.address) setConnectedUI(s.address);
-        else setDisconnectedUI();
-      });
-    }
-
-    return appKit;
-  };
-
-  // ==========================
-  // EVENTS
-  // ==========================
-  usdtInput.addEventListener("input", recalc);
-
-  maxBtn.addEventListener("click", () => {
-    usdtInput.value = String(remaining());
-    recalc();
-  });
-
-  connectBtn.addEventListener("click", async () => {
-    try {
-      const kit = await ensureAppKit();
-      // Opens the modal
-      await kit.open();
-    } catch (e) {
-      console.error(e);
-      setStatus("bad", "Wallet modal failed to open");
+  appKit.subscribeState((s) => {
+    if (s.address) {
+      connectBtn.textContent = shortAddr(s.address);
+      disconnectBtn.style.display = "inline-block";
+    } else {
+      connectBtn.textContent = "Connect Wallet";
+      disconnectBtn.style.display = "none";
     }
   });
+}
 
-  disconnectBtn.addEventListener("click", async () => {
-    try {
-      const kit = await ensureAppKit();
-      // Depending on SDK version, disconnect method might differ.
-      // We try the most common ones safely.
-      if (kit.disconnect) await kit.disconnect();
-      else if (kit?.adapter?.disconnect) await kit.adapter.disconnect();
-      setDisconnectedUI();
-      setStatus("neutral", "Disconnected");
-    } catch (e) {
-      console.error(e);
-      setStatus("bad", "Disconnect failed");
-    }
-  });
+connectBtn.addEventListener("click", async () => {
+  try {
+    if (!initialized) await initWallet();
+    await appKit.open();
+  } catch (err) {
+    console.error("Wallet open failed:", err);
+    alert("Wallet modal failed to open (check console)");
+  }
+});
 
-  buyBtn.addEventListener("click", () => {
-    // UI-only simulated purchase
-    const usdt = parseAmount(usdtInput.value);
-    const outWESEE = usdt / PRICE_USDT_PER_WESEE;
-
-    if (usdt < MIN_BUY_USDT) return;
-    if (outWESEE > remaining()) return;
-
-    sold += outWESEE;
-    usdtInput.value = "";
-    weseeInput.value = "";
-    setStatus("good", "UI demo: purchase simulated ✅");
-    recalc();
-  });
-
-  // initial paint
-  recalc();
-})();
+disconnectBtn.addEventListener("click", async () => {
+  try {
+    await appKit.disconnect();
+  } catch (e) {
+    console.error(e);
+  }
+});
