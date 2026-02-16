@@ -1,3 +1,6 @@
+import EthereumProvider from "https://esm.sh/@walletconnect/ethereum-provider@2.17.2?bundle";
+import { ethers } from "https://esm.sh/ethers@5.7.2?bundle";
+
 /* =========================
    SALE CONFIG (UI ONLY)
 ========================= */
@@ -14,7 +17,7 @@ const BSC_CHAIN_ID = 56;
 const BSC_RPC = "https://bsc-dataseed.binance.org/";
 
 /* =========================
-   ELEMENTS
+   ELEMENTS (همون‌های قبلی)
 ========================= */
 const connectBtn = document.getElementById("connectBtn");
 const disconnectBtn = document.getElementById("disconnectBtn");
@@ -36,7 +39,7 @@ function setStatus(text) {
 }
 
 /* =========================
-   SALE UI LOGIC
+   SALE UI LOGIC (همون پیوستگی)
 ========================= */
 function recalc() {
   const usdt = Number(usdtInput.value || 0);
@@ -60,21 +63,19 @@ buyBtn.addEventListener("click", () => {
 });
 
 /* =========================
-   WALLET LOGIC (Injected + WC v2)
+   WALLET (Injected + WC v2)
 ========================= */
-let externalProvider = null; // raw provider
-let web3Provider = null;     // ethers provider
-let wcProvider = null;       // WalletConnect v2 provider
+let externalProvider = null;
+let web3Provider = null;
+let wcProvider = null;
 
-/** Provider picker: prefer MetaMask/Trust when available */
 function getInjectedProvider(kind) {
   const eth = window.ethereum;
   if (!eth) return null;
 
-  // Multiple injected providers (some browsers)
   const providers = eth.providers && Array.isArray(eth.providers) ? eth.providers : null;
 
-  const isMetaMask = (p) => !!p && (p.isMetaMask === true);
+  const isMetaMask = (p) => !!p && p.isMetaMask === true;
   const isTrust = (p) => !!p && (p.isTrust === true || p.isTrustWallet === true);
 
   if (!providers) {
@@ -88,7 +89,6 @@ function getInjectedProvider(kind) {
   return providers[0] || null;
 }
 
-/** tiny chooser modal (no HTML changes) */
 function chooseWallet() {
   return new Promise((resolve) => {
     const overlay = document.createElement("div");
@@ -135,12 +135,10 @@ function chooseWallet() {
     document.body.appendChild(overlay);
 
     const cleanup = () => overlay.remove();
-
     box.querySelector("#btnMM").onclick = () => { cleanup(); resolve("metamask"); };
     box.querySelector("#btnTrust").onclick = () => { cleanup(); resolve("trust"); };
     box.querySelector("#btnWC").onclick = () => { cleanup(); resolve("walletconnect"); };
     box.querySelector("#btnCancel").onclick = () => { cleanup(); resolve(null); };
-
     overlay.addEventListener("click", (e) => {
       if (e.target === overlay) { cleanup(); resolve(null); }
     });
@@ -150,11 +148,8 @@ function chooseWallet() {
 async function connectInjected(kind) {
   const injected = getInjectedProvider(kind);
   if (!injected) {
-    if (kind === "metamask") {
-      alert("MetaMask not detected in this browser.");
-    } else {
-      alert("Trust Wallet not detected here. Open this site inside Trust Wallet browser, or use WalletConnect.");
-    }
+    if (kind === "metamask") alert("MetaMask not detected in this browser.");
+    else alert("Trust Wallet not detected here. Open this site inside Trust Wallet browser, or use WalletConnect.");
     return;
   }
 
@@ -177,35 +172,12 @@ async function connectInjected(kind) {
   externalProvider.on?.("chainChanged", () => location.reload());
 }
 
-function getWCProviderConstructor() {
-  // different UMD builds may expose different globals
-  return (
-    window.WalletConnectEthereumProvider ||
-    window.EthereumProvider ||
-    window.WalletConnectProvider ||
-    null
-  );
-}
-
 async function connectWalletConnectV2() {
-  const EthereumProvider = getWCProviderConstructor();
-
-  if (!EthereumProvider || typeof EthereumProvider.init !== "function") {
-    // show helpful debug info
-    console.error("WC globals:", {
-      WalletConnectEthereumProvider: window.WalletConnectEthereumProvider,
-      EthereumProvider: window.EthereumProvider,
-      WalletConnectProvider: window.WalletConnectProvider
-    });
-    alert("WalletConnect provider failed to load. Please hard refresh (or open in Private tab) and try again.");
-    return;
-  }
-
   wcProvider = await EthereumProvider.init({
     projectId: WC_PROJECT_ID,
     chains: [BSC_CHAIN_ID],
     rpcMap: { [BSC_CHAIN_ID]: BSC_RPC },
-    showQrModal: true,
+    showQrModal: true
   });
 
   await wcProvider.connect();
