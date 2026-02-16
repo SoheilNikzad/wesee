@@ -62,9 +62,31 @@ buyBtn.addEventListener("click", () => {
 /* =========================
    WALLET LOGIC (Injected + WC v2)
 ========================= */
-let externalProvider = null;     // raw provider (ethereum or wc)
-let web3Provider = null;         // ethers provider
-let wcProvider = null;           // WalletConnect provider (v2)
+let externalProvider = null; // raw provider
+let web3Provider = null;     // ethers provider
+let wcProvider = null;       // WalletConnect v2 provider
+
+/** Provider picker: prefer MetaMask/Trust when available */
+function getInjectedProvider(kind) {
+  const eth = window.ethereum;
+  if (!eth) return null;
+
+  // Multiple injected providers (some browsers)
+  const providers = eth.providers && Array.isArray(eth.providers) ? eth.providers : null;
+
+  const isMetaMask = (p) => !!p && (p.isMetaMask === true);
+  const isTrust = (p) => !!p && (p.isTrust === true || p.isTrustWallet === true);
+
+  if (!providers) {
+    if (kind === "metamask") return isMetaMask(eth) ? eth : null;
+    if (kind === "trust") return isTrust(eth) ? eth : null;
+    return eth;
+  }
+
+  if (kind === "metamask") return providers.find(isMetaMask) || null;
+  if (kind === "trust") return providers.find(isTrust) || null;
+  return providers[0] || null;
+}
 
 /** tiny chooser modal (no HTML changes) */
 function chooseWallet() {
@@ -78,7 +100,7 @@ function chooseWallet() {
 
     const box = document.createElement("div");
     box.style.cssText = `
-      width: min(420px, 100%); background: #0f1620; color: #e6edf7;
+      width: min(520px, 100%); background: #0f1620; color: #e6edf7;
       border: 1px solid rgba(255,255,255,.10); border-radius: 16px;
       box-shadow: 0 12px 40px rgba(0,0,0,.45);
       padding: 16px;
@@ -87,19 +109,26 @@ function chooseWallet() {
     box.innerHTML = `
       <div style="font-weight:900; font-size:16px; margin-bottom:10px;">Connect wallet</div>
       <div style="color: rgba(230,237,247,.66); font-size:13px; margin-bottom:14px;">
-        Choose a browser wallet (MetaMask/Trust) or WalletConnect.
+        Choose MetaMask, Trust Wallet, or WalletConnect.
       </div>
-      <div style="display:flex; flex-direction:column; gap:10px;">
-        <button id="btnInjected" style="padding:12px; border-radius:12px; border:1px solid rgba(255,255,255,.12); background:rgba(255,255,255,.04); color:#e6edf7; font-weight:800; cursor:pointer;">
-          Browser Wallet (MetaMask / Trust)
+
+      <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:10px;">
+        <button id="btnMM" style="flex:1; min-width:160px; padding:12px; border-radius:12px; border:1px solid rgba(255,255,255,.12); background:rgba(255,255,255,.04); color:#e6edf7; font-weight:900; cursor:pointer;">
+          MetaMask
         </button>
-        <button id="btnWC" style="padding:12px; border-radius:12px; border:1px solid rgba(255,255,255,.12); background:linear-gradient(135deg,#ff7a18,#ffb86b); color:#1a0e05; font-weight:900; cursor:pointer;">
-          WalletConnect (QR + All wallets)
-        </button>
-        <button id="btnCancel" style="padding:10px; border-radius:12px; border:1px solid rgba(255,255,255,.12); background:transparent; color:rgba(230,237,247,.8); font-weight:800; cursor:pointer;">
-          Cancel
+
+        <button id="btnTrust" style="flex:1; min-width:160px; padding:12px; border-radius:12px; border:1px solid rgba(255,255,255,.12); background:rgba(255,255,255,.04); color:#e6edf7; font-weight:900; cursor:pointer;">
+          Trust Wallet
         </button>
       </div>
+
+      <button id="btnWC" style="width:100%; padding:12px; border-radius:12px; border:1px solid rgba(255,255,255,.12); background:linear-gradient(135deg,#ff7a18,#ffb86b); color:#1a0e05; font-weight:900; cursor:pointer; margin-bottom:10px;">
+        WalletConnect (QR + All wallets)
+      </button>
+
+      <button id="btnCancel" style="width:100%; padding:10px; border-radius:12px; border:1px solid rgba(255,255,255,.12); background:transparent; color:rgba(230,237,247,.8); font-weight:900; cursor:pointer;">
+        Cancel
+      </button>
     `;
 
     overlay.appendChild(box);
@@ -107,7 +136,8 @@ function chooseWallet() {
 
     const cleanup = () => overlay.remove();
 
-    box.querySelector("#btnInjected").onclick = () => { cleanup(); resolve("injected"); };
+    box.querySelector("#btnMM").onclick = () => { cleanup(); resolve("metamask"); };
+    box.querySelector("#btnTrust").onclick = () => { cleanup(); resolve("trust"); };
     box.querySelector("#btnWC").onclick = () => { cleanup(); resolve("walletconnect"); };
     box.querySelector("#btnCancel").onclick = () => { cleanup(); resolve(null); };
 
@@ -117,13 +147,18 @@ function chooseWallet() {
   });
 }
 
-async function connectInjected() {
-  if (!window.ethereum) {
-    alert("No browser wallet found. Install MetaMask or open in Trust Wallet browser.");
+async function connectInjected(kind) {
+  const injected = getInjectedProvider(kind);
+  if (!injected) {
+    if (kind === "metamask") {
+      alert("MetaMask not detected in this browser.");
+    } else {
+      alert("Trust Wallet not detected here. Open this site inside Trust Wallet browser, or use WalletConnect.");
+    }
     return;
   }
 
-  externalProvider = window.ethereum;
+  externalProvider = injected;
   web3Provider = new ethers.providers.Web3Provider(externalProvider, "any");
 
   await externalProvider.request({ method: "eth_requestAccounts" });
@@ -142,11 +177,27 @@ async function connectInjected() {
   externalProvider.on?.("chainChanged", () => location.reload());
 }
 
+function getWCProviderConstructor() {
+  // different UMD builds may expose different globals
+  return (
+    window.WalletConnectEthereumProvider ||
+    window.EthereumProvider ||
+    window.WalletConnectProvider ||
+    null
+  );
+}
+
 async function connectWalletConnectV2() {
-  // UMD global name in this build:
-  const EthereumProvider = window.WalletConnectEthereumProvider;
-  if (!EthereumProvider) {
-    alert("WalletConnect provider failed to load. Hard refresh and try again.");
+  const EthereumProvider = getWCProviderConstructor();
+
+  if (!EthereumProvider || typeof EthereumProvider.init !== "function") {
+    // show helpful debug info
+    console.error("WC globals:", {
+      WalletConnectEthereumProvider: window.WalletConnectEthereumProvider,
+      EthereumProvider: window.EthereumProvider,
+      WalletConnectProvider: window.WalletConnectProvider
+    });
+    alert("WalletConnect provider failed to load. Please hard refresh (or open in Private tab) and try again.");
     return;
   }
 
@@ -154,7 +205,7 @@ async function connectWalletConnectV2() {
     projectId: WC_PROJECT_ID,
     chains: [BSC_CHAIN_ID],
     rpcMap: { [BSC_CHAIN_ID]: BSC_RPC },
-    showQrModal: true
+    showQrModal: true,
   });
 
   await wcProvider.connect();
@@ -179,7 +230,6 @@ async function connectWalletConnectV2() {
 
 async function disconnectWallet() {
   try {
-    // WalletConnect v2
     if (wcProvider?.disconnect) await wcProvider.disconnect();
   } catch (_) {}
 
@@ -192,12 +242,16 @@ async function disconnectWallet() {
   setStatus("Disconnected");
 }
 
+/* =========================
+   EVENTS
+========================= */
 connectBtn.addEventListener("click", async () => {
   try {
     const choice = await chooseWallet();
     if (!choice) return;
 
-    if (choice === "injected") await connectInjected();
+    if (choice === "metamask") await connectInjected("metamask");
+    if (choice === "trust") await connectInjected("trust");
     if (choice === "walletconnect") await connectWalletConnectV2();
   } catch (e) {
     console.error(e);
