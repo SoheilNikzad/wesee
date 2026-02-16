@@ -1,6 +1,3 @@
-import { createAppKit } from "https://cdn.jsdelivr.net/npm/@reown/appkit@1.7.7/+esm";
-import { EthersAdapter } from "https://cdn.jsdelivr.net/npm/@reown/appkit-adapter-ethers@1.7.7/+esm";
-
 /* =========================
    SALE CONFIG (UI ONLY)
 ========================= */
@@ -10,28 +7,10 @@ const PRICE = 1; // 1 USDT = 1 WESEE
 let sold = 0;
 
 /* =========================
-   WALLET CONFIG
+   WEB3 CONFIG
 ========================= */
 const PROJECT_ID = "6cd9185e9e8517c636ebaff85041eaf4";
-
-/* =========================
-   BSC NETWORK (MANUAL)
-========================= */
-const BSC = {
-  id: 56,
-  name: "BNB Smart Chain",
-  nativeCurrency: {
-    name: "BNB",
-    symbol: "BNB",
-    decimals: 18,
-  },
-  rpcUrls: {
-    default: { http: ["https://bsc-dataseed.binance.org"] },
-  },
-  blockExplorers: {
-    default: { name: "BscScan", url: "https://bscscan.com" },
-  },
-};
+const BSC_CHAIN_ID = 56;
 
 /* =========================
    ELEMENTS
@@ -81,61 +60,79 @@ buyBtn.addEventListener("click", () => {
 });
 
 /* =========================
-   WALLET INIT (SAFE)
+   WALLETCONNECT / WEB3MODAL
 ========================= */
-let appKit;
-let initialized = false;
+let provider;
+let web3Modal;
 
-async function initWallet() {
-  if (initialized) return;
+async function initWeb3Modal() {
+  if (web3Modal) return;
 
-  appKit = createAppKit({
-    projectId: PROJECT_ID,
-    adapters: [new EthersAdapter()],
-    networks: [BSC],
-    metadata: {
-      name: "WeSee",
-      description: "WeSee fixed price token sale",
-      url: "https://www.wesee.info",
-      icons: [], 
+  web3Modal = new window.Web3Modal.default({
+    cacheProvider: true,
+    providerOptions: {
+      walletconnect: {
+        package: window.WalletConnectProvider.default,
+        options: {
+          projectId: PROJECT_ID,
+          rpc: {
+            56: "https://bsc-dataseed.binance.org/",
+          },
+        },
+      },
     },
   });
+}
 
-  initialized = true;
+async function connectWallet() {
+  try {
+    await initWeb3Modal();
 
-  const state = appKit.getState();
-  if (state?.address) {
-    connectBtn.textContent = shortAddr(state.address);
+    const instance = await web3Modal.connect();
+    provider = new ethers.providers.Web3Provider(instance);
+
+    const signer = provider.getSigner();
+    const address = await signer.getAddress();
+    const network = await provider.getNetwork();
+
+    if (network.chainId !== BSC_CHAIN_ID) {
+      setStatus("Please switch to BSC");
+    } else {
+      setStatus("Wallet connected ✅");
+    }
+
+    connectBtn.textContent = shortAddr(address);
     disconnectBtn.style.display = "inline-block";
+
+    instance.on("accountsChanged", () => window.location.reload());
+    instance.on("chainChanged", () => window.location.reload());
+    instance.on("disconnect", disconnectWallet);
+  } catch (err) {
+    console.error(err);
+    alert("Wallet connection failed");
+  }
+}
+
+async function disconnectWallet() {
+  if (provider?.provider?.disconnect) {
+    await provider.provider.disconnect();
+  }
+  provider = null;
+
+  if (web3Modal) {
+    await web3Modal.clearCachedProvider();
   }
 
-  appKit.subscribeState((s) => {
-    if (s.address) {
-      connectBtn.textContent = shortAddr(s.address);
-      disconnectBtn.style.display = "inline-block";
-    } else {
-      connectBtn.textContent = "Connect Wallet";
-      disconnectBtn.style.display = "none";
-    }
-  });
+  connectBtn.textContent = "Connect Wallet";
+  disconnectBtn.style.display = "none";
+  setStatus("Disconnected");
 }
 
 /* =========================
    EVENTS
 ========================= */
-connectBtn.addEventListener("click", async () => {
-  try {
-    if (!initialized) await initWallet();
-    await appKit.open();
-  } catch (e) {
-    console.error(e);
-    alert("Wallet modal failed to open");
-  }
-});
-
-disconnectBtn.addEventListener("click", async () => {
-  await appKit.disconnect();
-});
+connectBtn.addEventListener("click", connectWallet);
+disconnectBtn.addEventListener("click", disconnectWallet);
 
 /* =========================
    INIT
