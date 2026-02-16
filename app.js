@@ -1,13 +1,12 @@
-import { createAppKit, bsc } from "https://cdn.jsdelivr.net/npm/@reown/appkit@1.7.7/+esm";
+import { createAppKit } from "https://cdn.jsdelivr.net/npm/@reown/appkit@1.7.7/+esm";
 import { EthersAdapter } from "https://cdn.jsdelivr.net/npm/@reown/appkit-adapter-ethers@1.7.7/+esm";
 
 /* =========================
    SALE CONFIG (UI ONLY)
 ========================= */
-const TOTAL_SUPPLY = 50000;      // WESEE
+const TOTAL_SUPPLY = 50000; // WESEE
 const MIN_BUY_USDT = 1;
-const PRICE = 1;                // 1 USDT = 1 WESEE
-
+const PRICE = 1; // 1 USDT = 1 WESEE
 let sold = 0;
 
 /* =========================
@@ -15,8 +14,24 @@ let sold = 0;
 ========================= */
 const PROJECT_ID = "6cd9185e9e8517c636ebaff85041eaf4";
 
-let appKit;
-let initialized = false;
+/* =========================
+   BSC NETWORK (MANUAL)
+========================= */
+const BSC = {
+  id: 56,
+  name: "BNB Smart Chain",
+  nativeCurrency: {
+    name: "BNB",
+    symbol: "BNB",
+    decimals: 18,
+  },
+  rpcUrls: {
+    default: { http: ["https://bsc-dataseed.binance.org"] },
+  },
+  blockExplorers: {
+    default: { name: "BscScan", url: "https://bscscan.com" },
+  },
+};
 
 /* =========================
    ELEMENTS
@@ -68,18 +83,21 @@ buyBtn.addEventListener("click", () => {
 /* =========================
    WALLET INIT (SAFE)
 ========================= */
+let appKit;
+let initialized = false;
+
 async function initWallet() {
   if (initialized) return;
 
   appKit = createAppKit({
     projectId: PROJECT_ID,
     adapters: [new EthersAdapter()],
-    networks: [bsc],
+    networks: [BSC],
     metadata: {
       name: "WeSee",
       description: "WeSee fixed price token sale",
       url: "https://www.wesee.info",
-      icons: ["https://www.wesee.info/favicon.ico"],
+      icons: [], 
     },
   });
 
