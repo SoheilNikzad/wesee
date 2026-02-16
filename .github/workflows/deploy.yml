@@ -1,5 +1,4 @@
 name: Deploy Vite to GitHub Pages
-
 on:
   push:
     branches: [ "main" ]
