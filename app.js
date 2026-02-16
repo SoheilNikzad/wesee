@@ -38,9 +38,19 @@ function setStatus(msg, ok = true) {
   statusText.style.color = ok ? "#7CFF9B" : "#FF6B6B";
 }
 
+function setConnectedUI(addr) {
+  if (connectBtn) connectBtn.textContent = shortAddr(addr);
+  if (disconnectBtn) disconnectBtn.style.display = "inline-block";
+}
+
+function setDisconnectedUI() {
+  if (connectBtn) connectBtn.textContent = "Connect Wallet";
+  if (disconnectBtn) disconnectBtn.style.display = "none";
+}
+
 function recalcSale() {
   const usdt = Number(usdtInput?.value || 0);
-  if (tokenOutput) tokenOutput.value = usdt ? (usdt / PRICE_USDT).toString() : "";
+  if (tokenOutput) tokenOutput.value = usdt ? String(usdt / PRICE_USDT) : "";
   if (remainingText) remainingText.textContent = `${remaining()} ${TOKEN_SYMBOL}`;
   if (buyBtn) buyBtn.disabled = usdt < MIN_BUY_USDT || usdt > remaining();
 }
@@ -86,18 +96,21 @@ function chooseWallet() {
 function getInjected(kind) {
   const eth = window.ethereum;
   if (!eth) return null;
-
   const list = eth.providers ?? [eth];
 
-  if (kind === "metamask") {
-    return list.find(p => p.isMetaMask) ?? null;
-  }
-
-  if (kind === "trust") {
-    return list.find(p => p.isTrust || p.isTrustWallet) ?? null;
-  }
+  if (kind === "metamask") return list.find(p => p.isMetaMask) ?? null;
+  if (kind === "trust") return list.find(p => p.isTrust || p.isTrustWallet) ?? null;
 
   return null;
+}
+
+async function updateNetworkStatus() {
+  try {
+    if (!web3Provider) return;
+    const net = await web3Provider.getNetwork();
+    if (net.chainId !== BSC.chainId) setStatus("Please switch to BSC", false);
+    else setStatus("Wallet connected ✅", true);
+  } catch (_) {}
 }
 
 async function connectInjected(kind) {
@@ -112,42 +125,47 @@ async function connectInjected(kind) {
 
   try {
     await externalProvider.request({ method: "eth_requestAccounts" });
-  } catch (e) {
+  } catch (_) {
     setStatus("Connection rejected", false);
     return;
   }
 
-  const signer = web3Provider.getSigner();
-  const addr = await signer.getAddress();
-  const net = await web3Provider.getNetwork();
+  const addr = await web3Provider.getSigner().getAddress();
+  setConnectedUI(addr);
+  await updateNetworkStatus();
 
-  if (connectBtn) connectBtn.textContent = shortAddr(addr);
-  if (disconnectBtn) disconnectBtn.style.display = "inline-block";
+  externalProvider.on?.("accountsChanged", async (accounts) => {
+    if (!accounts || !accounts[0]) {
+      await disconnectWallet();
+      return;
+    }
+    setConnectedUI(accounts[0]);
+    await updateNetworkStatus();
+  });
 
-  if (net.chainId !== BSC.chainId) {
-    setStatus("Please switch to BSC", false);
-  } else {
-    setStatus("Wallet connected ✅", true);
-  }
+  externalProvider.on?.("chainChanged", async () => {
+    await updateNetworkStatus();
+  });
+}
 
-  externalProvider.on?.("accountsChanged", () => location.reload());
-  externalProvider.on?.("chainChanged", () => location.reload());
+async function initWCProvider(showQrModal) {
+  wcProvider = await EthereumProvider.init({
+    projectId: WC_PROJECT_ID,
+    chains: [BSC.chainId],
+    rpcMap: { [BSC.chainId]: BSC.rpc },
+    showQrModal
+  });
+  return wcProvider;
 }
 
 async function connectWalletConnect() {
   try {
-    wcProvider = await EthereumProvider.init({
-      projectId: WC_PROJECT_ID,
-      chains: [BSC.chainId],
-      rpcMap: { [BSC.chainId]: BSC.rpc },
-      showQrModal: true
-    });
-
+    await initWCProvider(true);
     await wcProvider.connect();
   } catch (e) {
     const msg = (e && (e.message || e.toString())) || "WalletConnect error";
     if (String(msg).toLowerCase().includes("origin")) {
-      setStatus("WalletConnect blocked: origin not allowed (check Allowed Origins)", false);
+      setStatus("WalletConnect blocked: origin not allowed (Allowed Origins)", false);
     } else {
       setStatus("WalletConnect failed. Try Private tab / hard refresh.", false);
     }
@@ -157,22 +175,64 @@ async function connectWalletConnect() {
   externalProvider = wcProvider;
   web3Provider = new ethers.providers.Web3Provider(externalProvider, "any");
 
-  const signer = web3Provider.getSigner();
-  const addr = await signer.getAddress();
-  const net = await web3Provider.getNetwork();
+  const addr = await web3Provider.getSigner().getAddress();
+  setConnectedUI(addr);
+  await updateNetworkStatus();
 
-  if (connectBtn) connectBtn.textContent = shortAddr(addr);
-  if (disconnectBtn) disconnectBtn.style.display = "inline-block";
+  wcProvider.on?.("accountsChanged", async (accounts) => {
+    if (!accounts || !accounts[0]) {
+      await disconnectWallet();
+      return;
+    }
+    setConnectedUI(accounts[0]);
+    await updateNetworkStatus();
+  });
 
-  if (net.chainId !== BSC.chainId) {
-    setStatus("Please switch to BSC", false);
-  } else {
-    setStatus("Wallet connected ✅", true);
-  }
+  wcProvider.on?.("chainChanged", async () => {
+    await updateNetworkStatus();
+  });
 
-  wcProvider.on?.("accountsChanged", () => location.reload());
-  wcProvider.on?.("chainChanged", () => location.reload());
-  wcProvider.on?.("disconnect", () => disconnectWallet());
+  wcProvider.on?.("disconnect", async () => {
+    await disconnectWallet();
+  });
+}
+
+async function restoreWalletConnectSession() {
+  try {
+    await initWCProvider(false);
+    const hasSession = !!wcProvider?.session;
+    const hasAccounts = Array.isArray(wcProvider?.accounts) && wcProvider.accounts.length > 0;
+
+    if (!hasSession && !hasAccounts) return;
+
+    try { await wcProvider.enable(); } catch (_) {}
+
+    externalProvider = wcProvider;
+    web3Provider = new ethers.providers.Web3Provider(externalProvider, "any");
+
+    const accounts = wcProvider.accounts || [];
+    const addr = accounts[0] || await web3Provider.getSigner().getAddress();
+
+    setConnectedUI(addr);
+    await updateNetworkStatus();
+
+    wcProvider.on?.("accountsChanged", async (accts) => {
+      if (!accts || !accts[0]) {
+        await disconnectWallet();
+        return;
+      }
+      setConnectedUI(accts[0]);
+      await updateNetworkStatus();
+    });
+
+    wcProvider.on?.("chainChanged", async () => {
+      await updateNetworkStatus();
+    });
+
+    wcProvider.on?.("disconnect", async () => {
+      await disconnectWallet();
+    });
+  } catch (_) {}
 }
 
 async function disconnectWallet() {
@@ -184,9 +244,7 @@ async function disconnectWallet() {
   externalProvider = null;
   web3Provider = null;
 
-  if (connectBtn) connectBtn.textContent = "Connect Wallet";
-  if (disconnectBtn) disconnectBtn.style.display = "none";
-
+  setDisconnectedUI();
   setStatus("Disconnected");
 }
 
@@ -218,3 +276,5 @@ buyBtn?.addEventListener("click", () => {
 
 recalcSale();
 setStatus("Ready", true);
+setDisconnectedUI();
+restoreWalletConnectSession();
