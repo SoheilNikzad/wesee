@@ -22,10 +22,6 @@
           Download Whitepaper
         </a>
 
-        <button class="btn btn-ghost" id="switchBtn" type="button" style="display:none;">
-          Switch to BSC
-        </button>
-
         <button class="btn btn-primary" id="connectBtn" type="button">
           Connect Wallet
         </button>
@@ -61,7 +57,9 @@
         <div class="summary" style="margin-top:10px;">
           <div class="summary-row" style="border-bottom:none;">
             <span>Status</span>
-            <b id="statusText" class="status neutral">Please connect your wallet</b>
+            <button id="statusBtn" class="status-btn neutral" type="button" disabled>
+              Please connect your wallet
+            </button>
           </div>
         </div>
 
