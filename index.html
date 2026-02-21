@@ -1,109 +1,120 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>WeSee</title>
-    <link rel="icon" href="/favicon.ico" />
-  </head>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WeSee</title>
+</head>
 
-  <body>
-    <header class="topbar">
-      <div class="logo">
-        <span class="dot"></span>
-        <div>
-          <div class="brand">WeSee</div>
-          <div class="tagline">On-chain venture coordination tool</div>
+<body>
+  <header class="header">
+    <div class="header-left">
+      <div class="logo-dot"></div>
+      <div class="brand">
+        <div class="brand-name">WeSee</div>
+        <div class="brand-sub">On-chain venture coordination tool</div>
+      </div>
+    </div>
+
+    <div class="header-right">
+      <a
+        href="/assets/wesee-whitepaper-v0.1.pdf"
+        target="_blank"
+        class="btn secondary"
+      >
+        Download Whitepaper
+      </a>
+
+      <button id="connectBtn" class="btn primary">Connect Wallet</button>
+      <button id="disconnectBtn" class="btn ghost" style="display:none">
+        Disconnect
+      </button>
+    </div>
+  </header>
+
+  <main class="page">
+    <h1 class="title">Fixed Price Token Sale</h1>
+
+    <p class="subtitle">
+      Swap <span class="pill">USDT (BSC)</span> for
+      <span class="pill">WESEE</span>
+      at a fixed price: <b>$1 = 1 WESEE</b>.
+      Total available: <b>50,000 WESEE</b>.
+    </p>
+
+    <!-- 🔴 استاتوس واضح و بالا -->
+    <div class="status-box">
+      <span id="statusText">Please connect your wallet</span>
+    </div>
+
+    <div class="layout">
+      <section class="card swap-card">
+        <div class="card-head">
+          <h2>Swap</h2>
+          <span class="rate">1 USDT = 1 WESEE</span>
         </div>
-      </div>
 
-      <div class="top-actions">
-        <a class="whitepaper-btn" href="/assets/wesee-whitepaper-v0.1.pdf" target="_blank" rel="noreferrer">
-          Download Whitepaper
-        </a>
-        <button id="connectBtn" class="connect-btn">Connect Wallet</button>
-        <button id="disconnectBtn" class="disconnect-btn" style="display:none;">Disconnect</button>
-      </div>
-    </header>
-
-    <main class="container">
-      <h1>Fixed Price Token Sale</h1>
-
-      <p class="subtitle">
-        Swap <span class="pill">USDT (BSC)</span> for <span class="pill">WESEE</span>
-        at a fixed price: $1 = 1 WESEE. Total available: <b>50,000 WESEE</b>.
-      </p>
-
-      <div class="status-bar">
-        <span id="statusText">Please connect your wallet</span>
-      </div>
-
-      <div class="grid">
-        <section class="card">
-          <div class="card-header">
-            <h2>Swap</h2>
-            <span class="rate">1 USDT = 1 WESEE</span>
+        <div class="field">
+          <label>You pay</label>
+          <div class="input-wrap">
+            <input id="usdtAmount" type="number" placeholder="0.00" />
+            <span class="token">USDT</span>
           </div>
+          <div class="hint">Min: 1 USDT — Max: 50,000 USDT</div>
+        </div>
 
-          <div class="field">
-            <label>You pay</label>
-            <div class="input-row">
-              <input id="usdtAmount" type="number" min="0" placeholder="0.00" />
-              <span class="token">USDT</span>
-            </div>
-            <div class="hint">Min: 1 USDT — Max: 50,000 USDT</div>
+        <div class="swap-icon">⇅</div>
+
+        <div class="field">
+          <label>You receive</label>
+          <div class="input-wrap">
+            <input id="weseeAmount" type="text" placeholder="0.00" disabled />
+            <span class="token wesee">
+              <span class="token-dot WESEE"></span>
+              WESEE
+            </span>
           </div>
+          <div class="hint">Fixed price. No slippage.</div>
+        </div>
 
-          <div class="swap-icon">⇅</div>
-
-          <div class="field">
-            <label>You receive</label>
-            <div class="input-row">
-              <input id="weseeAmount" type="text" placeholder="0.00" disabled />
-              <span class="token wesee">
-                <span class="token-dot WESEE"></span>
-                WESEE
-              </span>
-            </div>
-            <div class="hint">Fixed price. No slippage.</div>
+        <div class="stats">
+          <div class="row">
+            <span>Remaining</span>
+            <span id="remainingText">50000 WESEE</span>
           </div>
-
-          <div class="stats">
-            <div class="row">
-              <span>Remaining</span>
-              <span id="remainingText">50000 WESEE</span>
-            </div>
-            <div class="row">
-              <span>Sold</span>
-              <span id="soldText">0 WESEE</span>
-            </div>
+          <div class="row">
+            <span>Sold</span>
+            <span id="soldText">0 WESEE</span>
           </div>
+        </div>
 
-          <button id="buyBtn" class="buy-btn" disabled>Buy WESEE</button>
-        </section>
+        <button id="buyBtn" class="btn buy" disabled>
+          Buy WESEE
+        </button>
+      </section>
 
-        <section class="card">
-          <h2>Sale Details</h2>
-          <ul class="details">
-            <li><span>Network</span><b>BSC</b></li>
-            <li><span>Payment</span><b>USDT (BEP-20)</b></li>
-            <li><span>Price</span><b>$1 per WESEE</b></li>
-            <li><span>Total for sale</span><b>50,000 WESEE</b></li>
-            <li><span>Min buy</span><b>1 USDT</b></li>
-            <li><span>Max buy</span><b>Up to remaining</b></li>
+      <section class="card info-card">
+        <h2>Sale Details</h2>
+        <ul class="details">
+          <li><span>Network</span><b>BSC</b></li>
+          <li><span>Payment</span><b>USDT (BEP-20)</b></li>
+          <li><span>Price</span><b>$1 per WESEE</b></li>
+          <li><span>Total for sale</span><b>50,000 WESEE</b></li>
+          <li><span>Min buy</span><b>1 USDT</b></li>
+          <li><span>Max buy</span><b>Up to remaining</b></li>
+        </ul>
+
+        <div class="steps">
+          <div>Next steps after deployment:</div>
+          <ul>
+            <li>approve USDT</li>
+            <li>buy WESEE via sale contract</li>
           </ul>
+        </div>
+      </section>
+    </div>
+  </main>
 
-          <div class="steps">
-            <div>Next steps after deployment:</div>
-            <ul>
-              <li>approve USDT</li>
-              <li>buy WESEE via sale contract</li>
-            </ul>
-          </div>
-        </section>
-      </div>
-    </main>
-
-    <script type="module" src="/src/app.js"></script>
-  </body>
+  <script type="module" src="/src/app.js"></script>
+</body>
 </html>
