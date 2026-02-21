@@ -45,6 +45,7 @@ body{
   margin: 0 auto;
 }
 
+/* ====== TOPBAR ====== */
 .topbar{
   position: sticky;
   top: 0;
@@ -86,6 +87,7 @@ body{
   flex-wrap: wrap;
 }
 
+/* ====== BUTTONS ====== */
 .btn{
   border: 1px solid transparent;
   border-radius: 12px;
@@ -116,6 +118,7 @@ body{
   background: rgba(255,255,255,.04);
 }
 
+/* ====== HERO ====== */
 .hero{
   padding: 34px 0 16px;
 }
@@ -141,44 +144,7 @@ body{
   max-width: 100%;
 }
 
-.statusbar{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap: 12px;
-  padding: 12px 14px;
-  border-radius: 14px;
-  border: 1px solid rgba(255,255,255,.10);
-  background: rgba(255,255,255,.02);
-  box-shadow: 0 10px 28px rgba(0,0,0,.18);
-  margin: 8px 0 10px;
-}
-.statusbar-left{
-  display:flex;
-  align-items:center;
-  gap: 10px;
-  min-width: 0;
-}
-.status-label{
-  color: var(--muted);
-  font-weight: 800;
-  font-size: 13px;
-}
-.switch-btn{
-  border-radius: 12px;
-  padding: 10px 12px;
-  border: 1px solid rgba(255,255,255,.14);
-  background: rgba(255,255,255,.06);
-  color: rgba(230,237,247,.95);
-  font-weight: 900;
-  cursor: pointer;
-  white-space: nowrap;
-}
-.switch-btn:hover{
-  background: rgba(255,255,255,.08);
-  border-color: rgba(255,255,255,.18);
-}
-
+/* ====== GRID ====== */
 .grid{
   display:grid;
   grid-template-columns: 1.2fr .8fr;
@@ -190,6 +156,7 @@ body{
   .brand{ min-width: auto; }
 }
 
+/* ====== CARD ====== */
 .card{
   background: linear-gradient(180deg, rgba(255,255,255,.03), transparent 35%), var(--card);
   border: 1px solid rgba(255,255,255,.08);
@@ -227,6 +194,7 @@ body{
   white-space: normal;
 }
 
+/* ====== SWAP ====== */
 .swap{
   margin-top: 12px;
 }
@@ -309,23 +277,7 @@ input:disabled{ opacity: .85; }
 }
 .link:hover{ text-decoration: underline; }
 
-.swap-divider{
-  display:flex;
-  justify-content:center;
-  margin: 4px 0;
-}
-.swap-icon{
-  width: 38px;
-  height: 38px;
-  border-radius: 14px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  border: 1px solid rgba(255,255,255,.10);
-  background: rgba(255,255,255,.03);
-  font-weight: 900;
-}
-
+/* ====== SUMMARY ====== */
 .summary{
   margin-top: 12px;
   border: 1px solid rgba(255,255,255,.08);
@@ -361,15 +313,7 @@ input:disabled{ opacity: .85; }
   font-size: 15px;
 }
 
-.note{
-  margin-top: 12px;
-  color: var(--muted);
-  font-size: 12px;
-  line-height: 1.45;
-  border-top: 1px solid rgba(255,255,255,.08);
-  padding-top: 12px;
-}
-
+/* ====== DETAILS LIST ====== */
 .list{
   margin-top: 12px;
 }
@@ -400,6 +344,7 @@ input:disabled{ opacity: .85; }
 }
 .small ul{ margin: 8px 0 0 18px; }
 
+/* ====== FOOTER ====== */
 .footer{
   display:flex;
   justify-content:space-between;
@@ -417,8 +362,14 @@ input:disabled{ opacity: .85; }
 }
 .footer-link:hover{ text-decoration: underline; }
 
+/* =========================
+   RESPONSIVE – MOBILE
+   ========================= */
 @media (max-width: 640px) {
-  .container{ width: calc(100% - 24px); }
+
+  .container{
+    width: calc(100% - 24px);
+  }
 
   .topbar-inner{
     flex-direction: column;
@@ -437,15 +388,6 @@ input:disabled{ opacity: .85; }
   .hero{ padding: 26px 0 10px; }
   .hero h1{ font-size: 26px; }
   .hero p{ font-size: 14px; }
-
-  .statusbar{
-    flex-direction: column;
-    align-items: flex-start;
-  }
-  .switch-btn{
-    width: 100%;
-    text-align: center;
-  }
 
   .card{ padding: 14px; }
   .card-header{
@@ -481,6 +423,7 @@ input:disabled{ opacity: .85; }
   }
 }
 
+/* ---------- Wallet Picker Modal ---------- */
 .wallet-modal-overlay{
   position: fixed;
   inset: 0;
