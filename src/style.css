@@ -563,3 +563,29 @@ input:disabled{ opacity: .85; }
     width: 100%;
   }
 }
+.status-btn{
+  border: none;
+  background: transparent;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  font-weight: 900;
+  color: rgba(255,255,255,.85);
+  text-align: right;
+  cursor: default;
+}
+
+.status-btn.good{ color: var(--good); }
+.status-btn.bad{ color: var(--bad); }
+.status-btn.neutral{ color: rgba(255,255,255,.85); }
+
+.status-btn:disabled{
+  cursor: default;
+  opacity: 1;
+}
+
+.status-btn.clickable{
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
