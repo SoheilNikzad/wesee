@@ -27,14 +27,12 @@ const tokenOutput = document.getElementById("weseeAmount");
 const buyBtn = document.getElementById("buyBtn");
 
 const remainingText = document.getElementById("remainingText");
-const soldText = document.getElementById("soldText");
-
 const statusText = document.getElementById("statusText");
-const statusText2 = document.getElementById("statusText2");
-const switchBtn = document.getElementById("switchBtn");
+const soldText = document.getElementById("soldText");
 
 const maxHint = document.getElementById("maxHint");
 const maxBtn = document.getElementById("maxBtn");
+
 const yearEl = document.getElementById("year");
 
 let externalProvider = null;
@@ -42,28 +40,19 @@ let web3Provider = null;
 
 let wcProvider = null;
 let wcInitPromise = null;
-let wcEventsWired = false;
 
-let isConnecting = false;
+let switchBtn = null;
+
+let activeWalletKind = null;
 
 const shortAddr = (a) => `${a.slice(0, 6)}…${a.slice(-4)}`;
 const remaining = () => Math.max(0, TOTAL_SUPPLY - sold);
 
-function setStatusClass(el, cls) {
-  if (!el) return;
-  el.classList.remove("good", "bad", "neutral");
-  el.classList.add(cls);
-}
-
-function setStatus(msg, type = "neutral") {
-  if (statusText) {
-    statusText.textContent = msg;
-    setStatusClass(statusText, type);
-  }
-  if (statusText2) {
-    statusText2.textContent = msg;
-    setStatusClass(statusText2, type);
-  }
+function setStatus(msg, kind = "neutral") {
+  if (!statusText) return;
+  statusText.textContent = msg;
+  statusText.classList.remove("neutral", "good", "bad");
+  statusText.classList.add(kind);
 }
 
 function setConnectedUI(addr) {
@@ -76,8 +65,42 @@ function setDisconnectedUI() {
   if (disconnectBtn) disconnectBtn.style.display = "none";
 }
 
+function ensureSwitchBtn() {
+  if (!statusText) return null;
+  if (switchBtn) return switchBtn;
+
+  const parent = statusText.parentElement || statusText;
+  switchBtn = document.createElement("button");
+  switchBtn.type = "button";
+  switchBtn.textContent = "Switch to BSC";
+  switchBtn.style.marginLeft = "12px";
+  switchBtn.style.padding = "8px 12px";
+  switchBtn.style.borderRadius = "12px";
+  switchBtn.style.border = "1px solid rgba(255,255,255,.14)";
+  switchBtn.style.background = "rgba(255,255,255,.06)";
+  switchBtn.style.color = "rgba(230,237,247,.95)";
+  switchBtn.style.fontWeight = "900";
+  switchBtn.style.cursor = "pointer";
+  switchBtn.style.display = "none";
+
+  switchBtn.addEventListener("click", async () => {
+    await switchToBSC();
+    await updateNetworkStatus();
+    recalcSale();
+  });
+
+  if (parent === statusText) {
+    statusText.insertAdjacentElement("afterend", switchBtn);
+  } else {
+    parent.appendChild(switchBtn);
+  }
+
+  return switchBtn;
+}
+
 function showSwitchBtn() {
-  if (switchBtn) switchBtn.style.display = "inline-flex";
+  const btn = ensureSwitchBtn();
+  if (btn) btn.style.display = "inline-flex";
 }
 
 function hideSwitchBtn() {
@@ -87,7 +110,7 @@ function hideSwitchBtn() {
 async function switchToBSC() {
   if (!externalProvider?.request) {
     setStatus("Please switch to BSC in your wallet.", "bad");
-    return false;
+    return;
   }
 
   try {
@@ -95,9 +118,10 @@ async function switchToBSC() {
       method: "wallet_switchEthereumChain",
       params: [{ chainId: BSC.chainIdHex }]
     });
-    return true;
+    return;
   } catch (e) {
-    if (e?.code === 4902) {
+    const code = e?.code;
+    if (code === 4902) {
       try {
         await externalProvider.request({
           method: "wallet_addEthereumChain",
@@ -115,41 +139,60 @@ async function switchToBSC() {
           params: [{ chainId: BSC.chainIdHex }]
         });
 
-        return true;
+        return;
       } catch (_) {
-        return false;
+        setStatus("Please add/switch to BSC manually in your wallet.", "bad");
+        return;
       }
     }
-    return false;
+
+    setStatus("Please switch to BSC in your wallet.", "bad");
   }
-}
-
-async function updateNetworkStatus() {
-  try {
-    if (!web3Provider) return;
-
-    const net = await web3Provider.getNetwork();
-    if (net.chainId !== BSC.chainId) {
-      setStatus("Please switch to BSC", "bad");
-      showSwitchBtn();
-      return;
-    }
-
-    hideSwitchBtn();
-    setStatus("Wallet connected ✅", "good");
-  } catch (_) {}
 }
 
 function recalcSale() {
   const usdt = Number(usdtInput?.value || 0);
+  const out = usdt ? usdt / PRICE_USDT : 0;
 
-  if (tokenOutput) tokenOutput.value = usdt ? String(usdt / PRICE_USDT) : "";
-  if (remainingText) remainingText.textContent = `${remaining()} ${TOKEN_SYMBOL}`;
-  if (soldText) soldText.textContent = `${sold} ${TOKEN_SYMBOL}`;
+  if (tokenOutput) tokenOutput.value = usdt ? String(out) : "";
 
-  const canBuy = !!web3Provider && usdt >= MIN_BUY_USDT && usdt <= remaining();
+  const rem = remaining();
+  if (remainingText) remainingText.textContent = `${rem.toLocaleString()} ${TOKEN_SYMBOL}`;
+  if (soldText) soldText.textContent = `${sold.toLocaleString()} ${TOKEN_SYMBOL}`;
+
+  if (maxHint) maxHint.textContent = rem.toLocaleString();
+
+  const validAmount = usdt >= MIN_BUY_USDT && usdt <= rem;
+  const canBuy = validAmount && isConnected() && isOnBSC();
   if (buyBtn) buyBtn.disabled = !canBuy;
-  if (maxHint) maxHint.textContent = String(remaining());
+}
+
+function isConnected() {
+  return !!web3Provider && !!externalProvider;
+}
+
+function isOnBSC() {
+  const last = web3Provider?._network?.chainId;
+  return last === BSC.chainId;
+}
+
+async function updateNetworkStatus() {
+  try {
+    if (!web3Provider) {
+      hideSwitchBtn();
+      setStatus("Please connect your wallet", "neutral");
+      return;
+    }
+
+    const net = await web3Provider.getNetwork();
+    if (net.chainId !== BSC.chainId) {
+      setStatus("Wrong network: switch to BSC", "bad");
+      showSwitchBtn();
+    } else {
+      hideSwitchBtn();
+      setStatus("Ready", "good");
+    }
+  } catch (_) {}
 }
 
 function chooseWallet() {
@@ -193,7 +236,6 @@ function chooseWallet() {
 function getInjected(kind) {
   const eth = window.ethereum;
   if (!eth) return null;
-
   const list = eth.providers ?? [eth];
 
   if (kind === "metamask") return list.find(p => p.isMetaMask) ?? null;
@@ -205,17 +247,23 @@ function getInjected(kind) {
 async function connectInjected(kind) {
   const injected = getInjected(kind);
   if (!injected) {
-    setStatus(kind === "trust" ? "Trust Wallet not detected" : "MetaMask not detected", "bad");
+    setStatus(`${kind === "trust" ? "Trust Wallet" : "MetaMask"} not detected`, "bad");
     return;
   }
+
+  activeWalletKind = kind;
 
   externalProvider = injected;
   web3Provider = new ethers.providers.Web3Provider(externalProvider, "any");
 
+  setStatus("Connecting…", "neutral");
+
   try {
     await externalProvider.request({ method: "eth_requestAccounts" });
-  } catch (_) {
-    setStatus("Connection rejected", "bad");
+  } catch (e) {
+    const code = e?.code;
+    if (code === 4001) setStatus("Connection rejected", "bad");
+    else setStatus("Failed to connect", "bad");
     return;
   }
 
@@ -261,12 +309,11 @@ async function initWCProvider() {
 }
 
 function wireWCEvents() {
-  if (!wcProvider?.on || wcEventsWired) return;
-  wcEventsWired = true;
+  if (!wcProvider?.on) return;
 
   wcProvider.on("accountsChanged", async (accounts) => {
     if (!accounts || !accounts[0]) {
-      await disconnectWallet();
+      await disconnectWallet(false);
       return;
     }
     setConnectedUI(accounts[0]);
@@ -285,6 +332,9 @@ function wireWCEvents() {
 }
 
 async function connectWalletConnect() {
+  activeWalletKind = "walletconnect";
+  setStatus("Connecting…", "neutral");
+
   try {
     await initWCProvider();
     wireWCEvents();
@@ -294,8 +344,13 @@ async function connectWalletConnect() {
     } else {
       try { await wcProvider.enable(); } catch (_) {}
     }
-  } catch (_) {
-    setStatus("WalletConnect failed. Try Private tab / hard refresh.", "bad");
+  } catch (e) {
+    const msg = String(e?.message || e || "");
+    if (msg.toLowerCase().includes("origin")) {
+      setStatus("WalletConnect blocked: origin not allowed", "bad");
+    } else {
+      setStatus("WalletConnect failed. Try Private tab / hard refresh.", "bad");
+    }
     return;
   }
 
@@ -343,6 +398,7 @@ async function disconnectWallet(clearWC = true) {
 
   externalProvider = null;
   web3Provider = null;
+  activeWalletKind = null;
 
   setDisconnectedUI();
   hideSwitchBtn();
@@ -351,60 +407,42 @@ async function disconnectWallet(clearWC = true) {
 }
 
 connectBtn?.addEventListener("click", async () => {
-  if (isConnecting) return;
-  isConnecting = true;
+  const choice = await chooseWallet();
+  if (!choice) return;
 
-  try {
-    const choice = await chooseWallet();
-    if (!choice) return;
-
-    if (choice === "metamask") await connectInjected("metamask");
-    if (choice === "trust") await connectInjected("trust");
-    if (choice === "walletconnect") await connectWalletConnect();
-  } finally {
-    isConnecting = false;
-  }
+  if (choice === "metamask") await connectInjected("metamask");
+  if (choice === "trust") await connectInjected("trust");
+  if (choice === "walletconnect") await connectWalletConnect();
 });
 
 disconnectBtn?.addEventListener("click", () => disconnectWallet(true));
 
-switchBtn?.addEventListener("click", async () => {
-  const ok = await switchToBSC();
-  if (ok) {
-    setStatus("Switched to BSC ✅", "good");
-  } else {
-    setStatus("Please switch to BSC in your wallet.", "bad");
-  }
-  await updateNetworkStatus();
-  recalcSale();
-});
-
-maxBtn?.addEventListener("click", () => {
-  if (!usdtInput) return;
-  usdtInput.value = String(remaining());
-  recalcSale();
-});
-
 usdtInput?.addEventListener("input", recalcSale);
 
-buyBtn?.addEventListener("click", () => {
-  const usdt = Number(usdtInput?.value || 0);
-  if (!web3Provider) return;
-  if (usdt < MIN_BUY_USDT || usdt > remaining()) return;
-
-  sold += usdt;
-
-  if (usdtInput) usdtInput.value = "";
-  if (tokenOutput) tokenOutput.value = "";
-
+maxBtn?.addEventListener("click", () => {
+  const rem = remaining();
+  if (usdtInput) usdtInput.value = String(rem);
   recalcSale();
-  setStatus("Demo purchase successful ✅", "good");
+});
+
+buyBtn?.addEventListener("click", async () => {
+  const usdt = Number(usdtInput?.value || 0);
+  const rem = remaining();
+
+  if (!isConnected()) return;
+  if (!isOnBSC()) {
+    setStatus("Wrong network: switch to BSC", "bad");
+    return;
+  }
+  if (usdt < MIN_BUY_USDT || usdt > rem) return;
+
+  setStatus("Coming soon", "neutral");
 });
 
 if (yearEl) yearEl.textContent = String(new Date().getFullYear());
 
-setDisconnectedUI();
-hideSwitchBtn();
-setStatus("Please connect your wallet", "neutral");
 recalcSale();
+setDisconnectedUI();
+ensureSwitchBtn();
+updateNetworkStatus();
 restoreWalletConnectSession();
