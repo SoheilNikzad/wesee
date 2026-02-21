@@ -1,3 +1,4 @@
+import "./style.css";
 import EthereumProvider from "@walletconnect/ethereum-provider";
 import { ethers } from "ethers";
 
