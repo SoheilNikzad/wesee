@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>WeSee — Token Sale</title>
-  <link rel="stylesheet" href="/src/style.css"/>
+  <link rel="stylesheet" href="/src/style.css" />
 </head>
 
 <body>
@@ -38,18 +38,18 @@
     <section class="hero">
       <h1>Fixed Price Token Sale</h1>
       <p>
-        Swap <span class="pill">USDT (BSC)</span> for <span class="pill">WESEE</span> at a fixed price:
+        Pay <span class="pill">USDT (BSC)</span> to receive <span class="pill">WESEE</span> at a fixed price:
         <b>$1 = 1 WESEE</b>. Total available: <b>50,000 WESEE</b>.
       </p>
     </section>
 
-    <section class="statusbar" id="statusBar">
-      <div class="statusbar-left">
-        <span class="status-label">Status:</span>
-        <b id="statusText" class="status neutral">Please connect your wallet</b>
-      </div>
-      <button id="switchBtn" class="switch-btn" type="button" style="display:none;">Switch to BSC</button>
-    </section>
+    <div class="status-banner" id="statusBanner">
+      <span class="status-label">Status:</span>
+      <b id="statusText" class="status neutral">Please connect your wallet</b>
+      <button class="btn btn-ghost btn-mini" id="switchBtn" type="button" style="display:none;">
+        Switch to BSC
+      </button>
+    </div>
 
     <section class="grid">
       <div class="card">
@@ -77,10 +77,6 @@
               Min: <b>1</b> USDT — Max: <b id="maxHint">50,000</b> USDT
               <button class="link" id="maxBtn" type="button">MAX</button>
             </div>
-          </div>
-
-          <div class="swap-divider">
-            <div class="swap-icon">⇅</div>
           </div>
 
           <div class="field">
@@ -112,10 +108,6 @@
             <button class="btn btn-primary btn-wide" id="buyBtn" type="button" disabled>
               Buy WESEE
             </button>
-          </div>
-
-          <div class="note">
-            <b>Note:</b> Wallet connection is enabled. On-chain purchase will be enabled after contracts are deployed.
           </div>
         </div>
       </div>
@@ -163,7 +155,7 @@
 
     <footer class="footer">
       <div class="muted">
-        © <span id="year"></span> WeSee — Open tool, no accounts, no servers.
+        © <span id="year"></span> WeSee
       </div>
       <div class="muted">
         <a class="footer-link" href="/assets/wesee-whitepaper-v0.1.pdf" target="_blank" rel="noopener">Whitepaper</a>
