@@ -22,7 +22,6 @@ let sold = 0;
 
 const connectBtn = document.getElementById("connectBtn");
 const disconnectBtn = document.getElementById("disconnectBtn");
-const switchBtn = document.getElementById("switchBtn");
 
 const usdtInput = document.getElementById("usdtAmount");
 const tokenOutput = document.getElementById("weseeAmount");
@@ -31,7 +30,7 @@ const maxBtn = document.getElementById("maxBtn");
 
 const remainingText = document.getElementById("remainingText");
 const soldText = document.getElementById("soldText");
-const statusText = document.getElementById("statusText");
+const statusBtn = document.getElementById("statusBtn");
 const maxHint = document.getElementById("maxHint");
 const yearEl = document.getElementById("year");
 
@@ -43,7 +42,6 @@ let wcInitPromise = null;
 let wcEventsWired = false;
 
 const toastRoot = document.getElementById("toastRoot");
-let toastSeq = 0;
 
 const shortAddr = (a) => `${a.slice(0, 6)}…${a.slice(-4)}`;
 const remaining = () => Math.max(0, TOTAL_SUPPLY - sold);
@@ -71,14 +69,15 @@ function toast(message, type = "bad", ms = 3400) {
   el.querySelector(".toast-close").addEventListener("click", close);
   toastRoot.appendChild(el);
   setTimeout(close, ms);
-  toastSeq++;
 }
 
-function setStatus(msg, kind = "neutral") {
-  if (!statusText) return;
-  statusText.textContent = msg;
-  statusText.classList.remove("good", "bad", "neutral");
-  statusText.classList.add(kind);
+function setStatus(msg, kind = "neutral", clickable = false) {
+  if (!statusBtn) return;
+  statusBtn.textContent = msg;
+  statusBtn.classList.remove("good", "bad", "neutral", "clickable");
+  statusBtn.classList.add(kind);
+  if (clickable) statusBtn.classList.add("clickable");
+  statusBtn.disabled = !clickable;
 }
 
 function setConnectedUI(addr) {
@@ -89,14 +88,6 @@ function setConnectedUI(addr) {
 function setDisconnectedUI() {
   if (connectBtn) connectBtn.textContent = "Connect Wallet";
   if (disconnectBtn) disconnectBtn.style.display = "none";
-}
-
-function showSwitchBtn() {
-  if (switchBtn) switchBtn.style.display = "inline-flex";
-}
-
-function hideSwitchBtn() {
-  if (switchBtn) switchBtn.style.display = "none";
 }
 
 function recalcSale() {
@@ -206,8 +197,7 @@ async function switchToBSC() {
 
 async function updateNetworkStatus() {
   if (!web3Provider) {
-    hideSwitchBtn();
-    setStatus("Please connect your wallet", "neutral");
+    setStatus("Please connect your wallet", "neutral", false);
     recalcSale();
     return;
   }
@@ -216,21 +206,18 @@ async function updateNetworkStatus() {
   try {
     net = await web3Provider.getNetwork();
   } catch {
-    hideSwitchBtn();
-    setStatus("Please connect your wallet", "neutral");
+    setStatus("Please connect your wallet", "neutral", false);
     recalcSale();
     return;
   }
 
   if (Number(net.chainId) !== BSC.chainId) {
-    showSwitchBtn();
-    setStatus("Please switch to BSC", "bad");
+    setStatus("Please switch to BSC", "bad", true);
     recalcSale();
     return;
   }
 
-  hideSwitchBtn();
-  setStatus("Wallet connected ✅", "good");
+  setStatus("Wallet connected ✅", "good", false);
   recalcSale();
 }
 
@@ -384,8 +371,7 @@ async function disconnectWallet(clearWC = true) {
   web3Provider = null;
 
   setDisconnectedUI();
-  hideSwitchBtn();
-  setStatus("Please connect your wallet", "neutral");
+  setStatus("Please connect your wallet", "neutral", false);
 
   if (buyBtn) buyBtn.disabled = true;
   if (usdtInput) usdtInput.value = "";
@@ -405,7 +391,8 @@ connectBtn?.addEventListener("click", async () => {
 
 disconnectBtn?.addEventListener("click", () => disconnectWallet(true));
 
-switchBtn?.addEventListener("click", async () => {
+statusBtn?.addEventListener("click", async () => {
+  if (!web3Provider) return;
   const ok = await switchToBSC();
   if (ok) await updateNetworkStatus();
 });
@@ -434,8 +421,7 @@ buyBtn?.addEventListener("click", async () => {
 
   if (Number(net.chainId) !== BSC.chainId) {
     toast("Please switch to BSC first.", "bad");
-    setStatus("Please switch to BSC", "bad");
-    showSwitchBtn();
+    setStatus("Please switch to BSC", "bad", true);
     return;
   }
 
@@ -457,7 +443,6 @@ buyBtn?.addEventListener("click", async () => {
 if (yearEl) yearEl.textContent = String(new Date().getFullYear());
 
 setDisconnectedUI();
-hideSwitchBtn();
-setStatus("Please connect your wallet", "neutral");
+setStatus("Please connect your wallet", "neutral", false);
 recalcSale();
 restoreWalletConnectSession();
