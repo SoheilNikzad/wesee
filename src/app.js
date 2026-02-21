@@ -43,10 +43,13 @@ let wcInitPromise = null;
 
 let switchBtn = null;
 
-let activeWalletKind = null;
-
 const shortAddr = (a) => `${a.slice(0, 6)}…${a.slice(-4)}`;
 const remaining = () => Math.max(0, TOTAL_SUPPLY - sold);
+
+const ua = (typeof navigator !== "undefined" && navigator.userAgent) ? navigator.userAgent : "";
+const isMobile = /Android|iPhone|iPad|iPod/i.test(ua);
+const isInMetaMask = /MetaMaskMobile/i.test(ua);
+const isInTrust = /Trust/i.test(ua) || /TrustWallet/i.test(ua);
 
 function setStatus(msg, kind = "neutral") {
   if (!statusText) return;
@@ -150,6 +153,15 @@ async function switchToBSC() {
   }
 }
 
+function isConnected() {
+  return !!web3Provider && !!externalProvider;
+}
+
+function isOnBSC() {
+  const last = web3Provider?._network?.chainId;
+  return last === BSC.chainId;
+}
+
 function recalcSale() {
   const usdt = Number(usdtInput?.value || 0);
   const out = usdt ? usdt / PRICE_USDT : 0;
@@ -159,21 +171,11 @@ function recalcSale() {
   const rem = remaining();
   if (remainingText) remainingText.textContent = `${rem.toLocaleString()} ${TOKEN_SYMBOL}`;
   if (soldText) soldText.textContent = `${sold.toLocaleString()} ${TOKEN_SYMBOL}`;
-
   if (maxHint) maxHint.textContent = rem.toLocaleString();
 
   const validAmount = usdt >= MIN_BUY_USDT && usdt <= rem;
   const canBuy = validAmount && isConnected() && isOnBSC();
   if (buyBtn) buyBtn.disabled = !canBuy;
-}
-
-function isConnected() {
-  return !!web3Provider && !!externalProvider;
-}
-
-function isOnBSC() {
-  const last = web3Provider?._network?.chainId;
-  return last === BSC.chainId;
 }
 
 async function updateNetworkStatus() {
@@ -244,14 +246,23 @@ function getInjected(kind) {
   return null;
 }
 
+function injectedMissingMessage(kind) {
+  const walletName = kind === "trust" ? "Trust Wallet" : "MetaMask";
+
+  if (isMobile) {
+    if (isInMetaMask || isInTrust) return `${walletName} provider not available. Use WalletConnect.`;
+    return `On mobile, use WalletConnect (recommended). ${walletName} works only inside its in-app browser.`;
+  }
+
+  return `${walletName} is not installed in this browser. Install the extension or use WalletConnect.`;
+}
+
 async function connectInjected(kind) {
   const injected = getInjected(kind);
   if (!injected) {
-    setStatus(`${kind === "trust" ? "Trust Wallet" : "MetaMask"} not detected`, "bad");
+    setStatus(injectedMissingMessage(kind), "bad");
     return;
   }
-
-  activeWalletKind = kind;
 
   externalProvider = injected;
   web3Provider = new ethers.providers.Web3Provider(externalProvider, "any");
@@ -332,7 +343,6 @@ function wireWCEvents() {
 }
 
 async function connectWalletConnect() {
-  activeWalletKind = "walletconnect";
   setStatus("Connecting…", "neutral");
 
   try {
@@ -398,7 +408,6 @@ async function disconnectWallet(clearWC = true) {
 
   externalProvider = null;
   web3Provider = null;
-  activeWalletKind = null;
 
   setDisconnectedUI();
   hideSwitchBtn();
