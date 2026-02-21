@@ -4,7 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>WeSee — Token Sale</title>
-  <link rel="stylesheet" href="/src/style.css" />
 </head>
 
 <body>
@@ -23,20 +22,15 @@
           Download Whitepaper
         </a>
 
-        <button class="btn btn-primary" id="connectBtn" type="button">
-          Connect Wallet
-        </button>
-
-        <button class="btn btn-ghost" id="disconnectBtn" type="button" style="display:none;">
-          Disconnect
-        </button>
+        <button class="btn btn-primary" id="connectBtn" type="button">Connect Wallet</button>
+        <button class="btn btn-ghost" id="disconnectBtn" type="button" style="display:none;">Disconnect</button>
       </nav>
     </div>
   </header>
 
   <main class="container">
     <section class="hero">
-      <h1>Fixed Price Token Sale</h1>
+      <h1>ٌWESEE Token</h1>
       <p>
         Buy <span class="pill">WESEE</span> with <span class="pill">USDT (BSC)</span> at a fixed price:
         <b>$1 = 1 WESEE</b>. Total available: <b>50,000 WESEE</b>.
@@ -50,19 +44,17 @@
             <div class="card-title">Buy WESEE</div>
             <div class="card-subtitle">USDT (BSC) → WESEE (fixed)</div>
           </div>
-          <div class="rate-badge" title="Fixed price">
-            1 USDT = 1 WESEE
+          <div class="rate-badge" title="Fixed price">1 USDT = 1 WESEE</div>
+        </div>
+
+        <div class="summary" style="margin-top:10px;">
+          <div class="summary-row" style="border-bottom:none;">
+            <span>Status</span>
+            <b id="statusText" class="status neutral">Please connect your wallet</b>
           </div>
         </div>
 
         <div class="swap">
-          <div class="summary" style="margin-top:0;">
-            <div class="summary-row" style="border-bottom:none;">
-              <span>Status</span>
-              <b id="statusText" class="status neutral">Please connect your wallet</b>
-            </div>
-          </div>
-
           <div class="field">
             <label for="usdtAmount">You pay</label>
             <div class="input-row">
@@ -78,6 +70,10 @@
             </div>
           </div>
 
+          <div class="swap-divider">
+            <div class="swap-icon">⇅</div>
+          </div>
+
           <div class="field">
             <label for="weseeAmount">You receive</label>
             <div class="input-row">
@@ -87,9 +83,7 @@
                 <span>WESEE</span>
               </div>
             </div>
-            <div class="field-hint">
-              Output is calculated at fixed price. No slippage.
-            </div>
+            <div class="field-hint">Output is calculated at fixed price. No slippage.</div>
           </div>
 
           <div class="summary">
@@ -104,9 +98,7 @@
           </div>
 
           <div class="actions">
-            <button class="btn btn-primary btn-wide" id="buyBtn" type="button" disabled>
-              Buy WESEE
-            </button>
+            <button class="btn btn-primary btn-wide" id="buyBtn" type="button" disabled>Buy WESEE</button>
           </div>
         </div>
       </div>
@@ -143,14 +135,14 @@
     </section>
 
     <footer class="footer">
-      <div class="muted">
-        © <span id="year"></span> WeSee — Open tool, no accounts, no servers.
-      </div>
+      <div class="muted">© <span id="year"></span> WeSee</div>
       <div class="muted">
         <a class="footer-link" href="/assets/wesee-whitepaper-v0.1.pdf" target="_blank" rel="noopener">Whitepaper</a>
       </div>
     </footer>
   </main>
+
+  <div id="toastRoot" class="toast-root" aria-live="polite" aria-atomic="true"></div>
 
   <script type="module" src="/src/app.js"></script>
 </body>
