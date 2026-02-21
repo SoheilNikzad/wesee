@@ -27,23 +27,24 @@ const tokenOutput = document.getElementById("weseeAmount");
 const buyBtn = document.getElementById("buyBtn");
 
 const remainingText = document.getElementById("remainingText");
-const statusText = document.getElementById("statusText");
+
+const statusBar = document.getElementById("statusBar");
+const statusBarText = document.getElementById("statusBarText");
+const switchNetworkBtn = document.getElementById("switchNetworkBtn");
 
 let externalProvider = null;
 let web3Provider = null;
 
 let wcProvider = null;
 let wcInitPromise = null;
-
-let switchBtn = null;
+let wcWired = false;
 
 const shortAddr = (a) => `${a.slice(0, 6)}…${a.slice(-4)}`;
 const remaining = () => Math.max(0, TOTAL_SUPPLY - sold);
 
-function setStatus(msg, ok = true) {
-  if (!statusText) return;
-  statusText.textContent = msg;
-  statusText.style.color = ok ? "#7CFF9B" : "#FF6B6B";
+function setStatusState(state, msg) {
+  if (statusBar) statusBar.dataset.state = state;
+  if (statusBarText) statusBarText.textContent = msg;
 }
 
 function setConnectedUI(addr) {
@@ -54,92 +55,6 @@ function setConnectedUI(addr) {
 function setDisconnectedUI() {
   if (connectBtn) connectBtn.textContent = "Connect Wallet";
   if (disconnectBtn) disconnectBtn.style.display = "none";
-}
-
-function ensureSwitchBtn() {
-  if (!statusText) return null;
-  if (switchBtn) return switchBtn;
-
-  const parent = statusText.parentElement || statusText;
-  switchBtn = document.createElement("button");
-  switchBtn.type = "button";
-  switchBtn.textContent = "Switch to BSC";
-  switchBtn.style.marginLeft = "12px";
-  switchBtn.style.padding = "8px 12px";
-  switchBtn.style.borderRadius = "12px";
-  switchBtn.style.border = "1px solid rgba(255,255,255,.14)";
-  switchBtn.style.background = "rgba(255,255,255,.06)";
-  switchBtn.style.color = "rgba(230,237,247,.95)";
-  switchBtn.style.fontWeight = "900";
-  switchBtn.style.cursor = "pointer";
-  switchBtn.style.display = "none";
-
-  switchBtn.addEventListener("click", async () => {
-    await switchToBSC();
-    await updateNetworkStatus();
-  });
-
-  if (parent === statusText) {
-    statusText.insertAdjacentElement("afterend", switchBtn);
-  } else {
-    parent.appendChild(switchBtn);
-  }
-
-  return switchBtn;
-}
-
-function showSwitchBtn() {
-  const btn = ensureSwitchBtn();
-  if (btn) btn.style.display = "inline-flex";
-}
-
-function hideSwitchBtn() {
-  if (switchBtn) switchBtn.style.display = "none";
-}
-
-async function switchToBSC() {
-  if (!externalProvider?.request) {
-    setStatus("Cannot switch network automatically. Please switch to BSC in your wallet.", false);
-    return;
-  }
-
-  try {
-    await externalProvider.request({
-      method: "wallet_switchEthereumChain",
-      params: [{ chainId: BSC.chainIdHex }]
-    });
-    setStatus("Switched to BSC ✅", true);
-    return;
-  } catch (e) {
-    const code = e?.code;
-    if (code === 4902) {
-      try {
-        await externalProvider.request({
-          method: "wallet_addEthereumChain",
-          params: [{
-            chainId: BSC.chainIdHex,
-            chainName: BSC.chainName,
-            nativeCurrency: BSC.nativeCurrency,
-            rpcUrls: BSC.rpcUrls,
-            blockExplorerUrls: BSC.blockExplorerUrls
-          }]
-        });
-
-        await externalProvider.request({
-          method: "wallet_switchEthereumChain",
-          params: [{ chainId: BSC.chainIdHex }]
-        });
-
-        setStatus("BSC added & switched ✅", true);
-        return;
-      } catch (_) {
-        setStatus("Please add/switch to BSC manually in your wallet.", false);
-        return;
-      }
-    }
-
-    setStatus("Please switch to BSC in your wallet.", false);
-  }
 }
 
 function recalcSale() {
@@ -198,17 +113,59 @@ function getInjected(kind) {
   return null;
 }
 
-async function updateNetworkStatus() {
-  try {
-    if (!web3Provider) return;
+async function switchToBSC() {
+  if (!externalProvider?.request) {
+    setStatusState("wrong_network", "Please switch to BSC in your wallet");
+    return false;
+  }
 
+  try {
+    await externalProvider.request({
+      method: "wallet_switchEthereumChain",
+      params: [{ chainId: BSC.chainIdHex }]
+    });
+    return true;
+  } catch (e) {
+    if (e?.code === 4902) {
+      try {
+        await externalProvider.request({
+          method: "wallet_addEthereumChain",
+          params: [{
+            chainId: BSC.chainIdHex,
+            chainName: BSC.chainName,
+            nativeCurrency: BSC.nativeCurrency,
+            rpcUrls: BSC.rpcUrls,
+            blockExplorerUrls: BSC.blockExplorerUrls
+          }]
+        });
+
+        await externalProvider.request({
+          method: "wallet_switchEthereumChain",
+          params: [{ chainId: BSC.chainIdHex }]
+        });
+        return true;
+      } catch (_) {
+        setStatusState("wrong_network", "Please add/switch to BSC manually in your wallet");
+        return false;
+      }
+    }
+
+    setStatusState("wrong_network", "Please switch to BSC in your wallet");
+    return false;
+  }
+}
+
+async function updateNetworkStatus() {
+  if (!web3Provider) return;
+
+  try {
     const net = await web3Provider.getNetwork();
     if (net.chainId !== BSC.chainId) {
-      setStatus("Please switch to BSC", false);
-      showSwitchBtn();
+      setStatusState("wrong_network", "Please switch to BSC");
+      if (switchNetworkBtn) switchNetworkBtn.style.display = "inline-flex";
     } else {
-      hideSwitchBtn();
-      setStatus("Wallet connected ✅", true);
+      setStatusState("connected", "Wallet connected ✅");
+      if (switchNetworkBtn) switchNetworkBtn.style.display = "none";
     }
   } catch (_) {}
 }
@@ -216,7 +173,7 @@ async function updateNetworkStatus() {
 async function connectInjected(kind) {
   const injected = getInjected(kind);
   if (!injected) {
-    setStatus(`${kind === "trust" ? "Trust Wallet" : "MetaMask"} not detected`, false);
+    setStatusState("disconnected", `${kind === "trust" ? "Trust Wallet" : "MetaMask"} not detected`);
     return;
   }
 
@@ -226,7 +183,7 @@ async function connectInjected(kind) {
   try {
     await externalProvider.request({ method: "eth_requestAccounts" });
   } catch (_) {
-    setStatus("Connection rejected", false);
+    setStatusState("disconnected", "Connection rejected");
     return;
   }
 
@@ -236,7 +193,7 @@ async function connectInjected(kind) {
 
   externalProvider.on?.("accountsChanged", async (accounts) => {
     if (!accounts || !accounts[0]) {
-      await disconnectWallet();
+      await disconnectWallet(true);
       return;
     }
     setConnectedUI(accounts[0]);
@@ -268,12 +225,14 @@ async function initWCProvider() {
   return wcInitPromise;
 }
 
-function wireWCEvents() {
+function wireWCEventsOnce() {
   if (!wcProvider?.on) return;
+  if (wcWired) return;
+  wcWired = true;
 
   wcProvider.on("accountsChanged", async (accounts) => {
     if (!accounts || !accounts[0]) {
-      await disconnectWallet();
+      await disconnectWallet(false);
       return;
     }
     setConnectedUI(accounts[0]);
@@ -292,19 +251,14 @@ function wireWCEvents() {
 async function connectWalletConnect() {
   try {
     await initWCProvider();
-    wireWCEvents();
-
-    if (!wcProvider?.session) {
-      await wcProvider.connect();
-    } else {
-      try { await wcProvider.enable(); } catch (_) {}
-    }
+    wireWCEventsOnce();
+    await wcProvider.connect();
   } catch (e) {
     const msg = String(e?.message || e || "");
     if (msg.toLowerCase().includes("origin")) {
-      setStatus("WalletConnect blocked: origin not allowed (Allowed Origins)", false);
+      setStatusState("disconnected", "WalletConnect blocked: origin not allowed");
     } else {
-      setStatus("WalletConnect failed. Try Private tab / hard refresh.", false);
+      setStatusState("disconnected", "WalletConnect failed. Try Private tab / hard refresh.");
     }
     return;
   }
@@ -312,19 +266,16 @@ async function connectWalletConnect() {
   externalProvider = wcProvider;
   web3Provider = new ethers.providers.Web3Provider(externalProvider, "any");
 
-  let addr = null;
-  try {
-    addr = wcProvider.accounts?.[0] || await web3Provider.getSigner().getAddress();
-  } catch (_) {}
-
+  const addr = wcProvider.accounts?.[0] || null;
   if (addr) setConnectedUI(addr);
+
   await updateNetworkStatus();
 }
 
 async function restoreWalletConnectSession() {
   try {
     await initWCProvider();
-    wireWCEvents();
+    wireWCEventsOnce();
 
     const hasSession = !!wcProvider?.session;
     const hasAccounts = Array.isArray(wcProvider?.accounts) && wcProvider.accounts.length > 0;
@@ -339,7 +290,7 @@ async function restoreWalletConnectSession() {
     const addr = wcProvider.accounts?.[0] || await web3Provider.getSigner().getAddress();
     setConnectedUI(addr);
     await updateNetworkStatus();
-  } catch (e) {
+  } catch (_) {
     try { await wcProvider?.disconnect?.(); } catch (_) {}
   }
 }
@@ -353,8 +304,8 @@ async function disconnectWallet(clearWC = true) {
   web3Provider = null;
 
   setDisconnectedUI();
-  hideSwitchBtn();
-  setStatus("Disconnected");
+  if (switchNetworkBtn) switchNetworkBtn.style.display = "none";
+  setStatusState("disconnected", "Connect your wallet");
 }
 
 connectBtn?.addEventListener("click", async () => {
@@ -368,6 +319,11 @@ connectBtn?.addEventListener("click", async () => {
 
 disconnectBtn?.addEventListener("click", () => disconnectWallet(true));
 
+switchNetworkBtn?.addEventListener("click", async () => {
+  const ok = await switchToBSC();
+  if (ok) await updateNetworkStatus();
+});
+
 usdtInput?.addEventListener("input", recalcSale);
 
 buyBtn?.addEventListener("click", () => {
@@ -380,11 +336,11 @@ buyBtn?.addEventListener("click", () => {
   if (tokenOutput) tokenOutput.value = "";
 
   recalcSale();
-  setStatus("Demo purchase successful (UI only) ✅", true);
+  setStatusState("connected", "Demo purchase successful (UI only) ✅");
 });
 
 recalcSale();
-setStatus("Ready", true);
 setDisconnectedUI();
-ensureSwitchBtn();
+setStatusState("disconnected", "Connect your wallet");
+if (switchNetworkBtn) switchNetworkBtn.style.display = "none";
 restoreWalletConnectSession();
