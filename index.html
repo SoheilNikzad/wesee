@@ -38,25 +38,17 @@
     <section class="hero">
       <h1>Fixed Price Token Sale</h1>
       <p>
-        Pay <span class="pill">USDT (BSC)</span> to receive <span class="pill">WESEE</span> at a fixed price:
+        Buy <span class="pill">WESEE</span> with <span class="pill">USDT (BSC)</span> at a fixed price:
         <b>$1 = 1 WESEE</b>. Total available: <b>50,000 WESEE</b>.
       </p>
     </section>
-
-    <div class="status-banner" id="statusBanner">
-      <span class="status-label">Status:</span>
-      <b id="statusText" class="status neutral">Please connect your wallet</b>
-      <button class="btn btn-ghost btn-mini" id="switchBtn" type="button" style="display:none;">
-        Switch to BSC
-      </button>
-    </div>
 
     <section class="grid">
       <div class="card">
         <div class="card-header">
           <div>
-            <div class="card-title">Swap</div>
-            <div class="card-subtitle">USDT → WESEE (fixed)</div>
+            <div class="card-title">Buy WESEE</div>
+            <div class="card-subtitle">USDT (BSC) → WESEE (fixed)</div>
           </div>
           <div class="rate-badge" title="Fixed price">
             1 USDT = 1 WESEE
@@ -64,6 +56,13 @@
         </div>
 
         <div class="swap">
+          <div class="summary" style="margin-top:0;">
+            <div class="summary-row" style="border-bottom:none;">
+              <span>Status</span>
+              <b id="statusText" class="status neutral">Please connect your wallet</b>
+            </div>
+          </div>
+
           <div class="field">
             <label for="usdtAmount">You pay</label>
             <div class="input-row">
@@ -140,22 +139,12 @@
             <b>Up to remaining</b>
           </div>
         </div>
-
-        <div class="divider"></div>
-
-        <div class="small">
-          Next steps after deployment:
-          <ul>
-            <li>approve USDT</li>
-            <li>buy WESEE via sale contract</li>
-          </ul>
-        </div>
       </div>
     </section>
 
     <footer class="footer">
       <div class="muted">
-        © <span id="year"></span> WeSee
+        © <span id="year"></span> WeSee — Open tool, no accounts, no servers.
       </div>
       <div class="muted">
         <a class="footer-link" href="/assets/wesee-whitepaper-v0.1.pdf" target="_blank" rel="noopener">Whitepaper</a>
