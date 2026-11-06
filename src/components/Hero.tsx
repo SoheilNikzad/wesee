@@ -34,7 +34,7 @@ export const Hero: React.FC<HeroProps> = ({
       isDarkMode ? 'border-neutral-800 bg-[#0A0A0A]' : 'border-neutral-200 bg-white'
     }`}>
       {/* Background Glow */}
-      <div className={`absolute top-0 left-1/2 -translate-x-1/2 w-2/3 h-96 blur-3xl -z-10 pointer-events-none ${
+      <div className={`absolute top-0 left-1/2 -tranneutral-x-1/2 w-2/3 h-96 blur-3xl -z-10 pointer-events-none ${
         isDarkMode 
           ? 'bg-gradient-to-b from-[#F7931A]/10 via-transparent to-transparent' 
           : 'bg-gradient-to-b from-[#F7931A]/10 via-transparent to-transparent'
@@ -46,7 +46,7 @@ export const Hero: React.FC<HeroProps> = ({
           {/* Badge */}
           <div className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full border text-xs font-semibold mb-6 shadow-xs ${
             isDarkMode 
-              ? 'bg-slate-900/90 border-[#F7931A]/40 text-[#F7931A]' 
+              ? 'bg-neutral-900/90 border-[#F7931A]/40 text-[#F7931A]' 
               : 'bg-[#FFF4E5] border-[#F7931A]/50 text-[#C46A00]'
           }`}>
             <span className="w-2 h-2 rounded-full bg-[#F7931A] animate-pulse" />
@@ -57,7 +57,7 @@ export const Hero: React.FC<HeroProps> = ({
           <h1 className={`text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-tight sm:leading-tight mb-6 ${
             isRtl ? 'font-vazir' : 'font-outfit'
           } ${
-            isDarkMode ? 'text-white' : 'text-slate-950'
+            isDarkMode ? 'text-white' : 'text-neutral-950'
           }`}>
             {t.heroTitle1}{' '}
             <span className="text-[#F7931A] font-comfortaa">
@@ -67,7 +67,7 @@ export const Hero: React.FC<HeroProps> = ({
 
           {/* Description */}
           <p className={`text-base sm:text-lg leading-relaxed mb-8 font-vazir ${
-            isDarkMode ? 'text-slate-300' : 'text-slate-600'
+            isDarkMode ? 'text-neutral-300' : 'text-neutral-600'
           }`}>
             {t.heroDesc}
           </p>
@@ -88,8 +88,8 @@ export const Hero: React.FC<HeroProps> = ({
               onClick={onExplore}
               className={`w-full sm:w-auto flex items-center justify-center gap-2 px-7 py-3.5 rounded-2xl border font-bold text-sm transition-all font-vazir ${
                 isDarkMode 
-                  ? 'bg-slate-900 hover:bg-slate-800 border-slate-700 text-white hover:border-[#F7931A]/50' 
-                  : 'bg-white hover:bg-slate-50 border-slate-300 text-slate-800 hover:border-slate-400 shadow-xs'
+                  ? 'bg-neutral-900 hover:bg-neutral-800 border-neutral-700 text-white hover:border-[#F7931A]/50' 
+                  : 'bg-white hover:bg-neutral-50 border-neutral-300 text-neutral-800 hover:border-neutral-400 shadow-xs'
               }`}
             >
               <Coins className="w-4 h-4 text-[#F7931A]" />

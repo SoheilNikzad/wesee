@@ -58,12 +58,12 @@ export const AssetCatalog: React.FC<AssetCatalogProps> = ({
             <span className="font-vazir">{t.catalogTitle}</span>
           </div>
           <h2 className={`text-3xl font-black tracking-tight font-vazir ${
-            isDarkMode ? 'text-white' : 'text-slate-900'
+            isDarkMode ? 'text-white' : 'text-neutral-900'
           }`}>
             {t.catalogSubtitle}
           </h2>
           <p className={`text-xs sm:text-sm mt-2 max-w-2xl font-vazir ${
-            isDarkMode ? 'text-slate-400' : 'text-slate-600'
+            isDarkMode ? 'text-neutral-400' : 'text-neutral-600'
           }`}>
             فرصت‌های سرمایه‌گذاری با پشتوانه رسمی دادگستری و قابلیت نقدشوندگی آنی روی شبکه‌های کم‌کارمزد.
           </p>
@@ -81,7 +81,7 @@ export const AssetCatalog: React.FC<AssetCatalogProps> = ({
 
       {/* Filter and Search Bar */}
       <div className={`flex flex-col sm:flex-row items-center justify-between gap-4 mb-8 p-3 rounded-2xl border transition-colors ${
-        isDarkMode ? 'bg-slate-900/60 border-slate-800' : 'bg-white border-slate-200 shadow-xs'
+        isDarkMode ? 'bg-neutral-900/60 border-neutral-800' : 'bg-white border-neutral-200 shadow-xs'
       }`}>
         {/* Categories */}
         <div className="flex items-center gap-1.5 overflow-x-auto w-full sm:w-auto pb-2 sm:pb-0 scrollbar-none font-vazir">
@@ -92,7 +92,7 @@ export const AssetCatalog: React.FC<AssetCatalogProps> = ({
               className={`px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all ${
                 selectedCategory === cat.id
                   ? 'bg-[#F7931A] text-black shadow-md shadow-[#F7931A]/20'
-                  : isDarkMode ? 'text-slate-400 hover:text-white hover:bg-slate-800' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                  : isDarkMode ? 'text-neutral-400 hover:text-white hover:bg-neutral-800' : 'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100'
               }`}
             >
               {cat.label}
@@ -109,11 +109,11 @@ export const AssetCatalog: React.FC<AssetCatalogProps> = ({
             placeholder={t.searchPlaceholder}
             className={`w-full pl-4 pr-10 py-2 rounded-xl border text-xs focus:outline-none focus:border-[#F7931A] font-vazir ${
               isDarkMode 
-                ? 'bg-slate-950 border-slate-800 text-white placeholder-slate-500' 
-                : 'bg-slate-50 border-slate-300 text-slate-900 placeholder-slate-400'
+                ? 'bg-neutral-950 border-neutral-800 text-white placeholder-neutral-500' 
+                : 'bg-neutral-50 border-neutral-300 text-neutral-900 placeholder-neutral-400'
             }`}
           />
-          <Search className="w-4 h-4 text-slate-400 absolute right-3.5 top-2.5" />
+          <Search className="w-4 h-4 text-neutral-400 absolute right-3.5 top-2.5" />
         </div>
       </div>
 
@@ -133,14 +133,14 @@ export const AssetCatalog: React.FC<AssetCatalogProps> = ({
             >
               <div>
                 {/* Image & Badges */}
-                <div className="relative h-48 w-full overflow-hidden bg-slate-900">
+                <div className="relative h-48 w-full overflow-hidden bg-neutral-900">
                   <img
                     src={asset.imageUrl}
                     alt={asset.title}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
                   <div className={`absolute inset-0 opacity-80 ${
-                    isDarkMode ? 'bg-gradient-to-t from-[#121622] via-transparent to-transparent' : 'bg-gradient-to-t from-white via-transparent to-transparent'
+                    isDarkMode ? 'bg-gradient-to-t from-[#121212] via-transparent to-transparent' : 'bg-gradient-to-t from-white via-transparent to-transparent'
                   }`} />
                   
                   {/* Category Badge */}
@@ -163,38 +163,38 @@ export const AssetCatalog: React.FC<AssetCatalogProps> = ({
 
                 {/* Content */}
                 <div className="p-5">
-                  <div className="flex items-center gap-1.5 text-xs text-slate-400 mb-1.5 font-vazir">
+                  <div className="flex items-center gap-1.5 text-xs text-neutral-400 mb-1.5 font-vazir">
                     <MapPin className="w-3.5 h-3.5 text-[#F7931A] shrink-0" />
                     <span>{asset.location}</span>
                   </div>
 
                   <h3 className={`text-base font-bold line-clamp-1 mb-2 group-hover:text-[#F7931A] transition-colors font-vazir ${
-                    isDarkMode ? 'text-white' : 'text-slate-900'
+                    isDarkMode ? 'text-white' : 'text-neutral-900'
                   }`}>
                     {asset.title}
                   </h3>
 
                   <div className={`flex items-center justify-between text-xs py-2 px-3 rounded-xl border mb-4 ${
-                    isDarkMode ? 'bg-black/40 border-slate-800' : 'bg-slate-50 border-slate-200'
+                    isDarkMode ? 'bg-black/40 border-neutral-800' : 'bg-neutral-50 border-neutral-200'
                   }`}>
-                    <span className={`font-vazir ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>{t.tokenSymbol}:</span>
+                    <span className={`font-vazir ${isDarkMode ? 'text-neutral-400' : 'text-neutral-500'}`}>{t.tokenSymbol}:</span>
                     <span className="font-mono font-bold text-[#F7931A]">{asset.tokenSymbol}</span>
                   </div>
 
                   {/* Financial Metrics */}
                   <div className="grid grid-cols-2 gap-2 text-xs mb-4">
                     <div className={`p-2.5 rounded-xl border ${
-                      isDarkMode ? 'bg-slate-900/60 border-slate-800' : 'bg-slate-50 border-slate-200'
+                      isDarkMode ? 'bg-neutral-900/60 border-neutral-800' : 'bg-neutral-50 border-neutral-200'
                     }`}>
-                      <p className={`text-[10px] font-vazir ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>{t.totalValuation}</p>
-                      <p className={`text-sm font-bold font-mono mt-0.5 ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
+                      <p className={`text-[10px] font-vazir ${isDarkMode ? 'text-neutral-400' : 'text-neutral-500'}`}>{t.totalValuation}</p>
+                      <p className={`text-sm font-bold font-mono mt-0.5 ${isDarkMode ? 'text-white' : 'text-neutral-900'}`}>
                         ${asset.totalValuationUSD.toLocaleString()}
                       </p>
                     </div>
                     <div className={`p-2.5 rounded-xl border ${
-                      isDarkMode ? 'bg-slate-900/60 border-slate-800' : 'bg-slate-50 border-slate-200'
+                      isDarkMode ? 'bg-neutral-900/60 border-neutral-800' : 'bg-neutral-50 border-neutral-200'
                     }`}>
-                      <p className={`text-[10px] font-vazir ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>{t.tokenPrice}</p>
+                      <p className={`text-[10px] font-vazir ${isDarkMode ? 'text-neutral-400' : 'text-neutral-500'}`}>{t.tokenPrice}</p>
                       <p className="text-sm font-bold text-[#F7931A] font-mono mt-0.5">${asset.tokenPriceUSD}</p>
                     </div>
                   </div>
@@ -202,11 +202,11 @@ export const AssetCatalog: React.FC<AssetCatalogProps> = ({
                   {/* Progress Bar */}
                   <div className="space-y-1.5 mb-2 font-vazir">
                     <div className="flex items-center justify-between text-[11px]">
-                      <span className={isDarkMode ? 'text-slate-400' : 'text-slate-500'}>{t.funded}:</span>
-                      <span className={`font-bold ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>{progressPercent}٪</span>
+                      <span className={isDarkMode ? 'text-neutral-400' : 'text-neutral-500'}>{t.funded}:</span>
+                      <span className={`font-bold ${isDarkMode ? 'text-white' : 'text-neutral-900'}`}>{progressPercent}٪</span>
                     </div>
                     <div className={`w-full h-2 rounded-full overflow-hidden ${
-                      isDarkMode ? 'bg-slate-800' : 'bg-slate-200'
+                      isDarkMode ? 'bg-neutral-800' : 'bg-neutral-200'
                     }`}>
                       <div 
                         className="h-full bg-gradient-to-r from-[#F7931A] to-[#FFB84D] rounded-full transition-all duration-500" 
@@ -223,8 +223,8 @@ export const AssetCatalog: React.FC<AssetCatalogProps> = ({
                   onClick={() => onSelectAsset(asset)}
                   className={`w-full py-2.5 rounded-xl font-bold text-xs border transition-all flex items-center justify-center gap-2 group-hover:shadow-lg font-vazir ${
                     isDarkMode 
-                      ? 'bg-slate-800 hover:bg-[#F7931A] hover:text-black text-slate-200 border-slate-700' 
-                      : 'bg-slate-100 hover:bg-[#F7931A] hover:text-black text-slate-800 border-slate-200'
+                      ? 'bg-neutral-800 hover:bg-[#F7931A] hover:text-black text-neutral-200 border-neutral-700' 
+                      : 'bg-neutral-100 hover:bg-[#F7931A] hover:text-black text-neutral-800 border-neutral-200'
                   }`}
                 >
                   <span>{t.viewDetails}</span>

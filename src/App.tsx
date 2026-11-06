@@ -52,12 +52,12 @@ export function App() {
     if (isDarkMode) {
       document.body.classList.remove('light-theme');
       document.body.classList.add('dark-theme');
-      document.body.style.backgroundColor = '#0B0E14';
+      document.body.style.backgroundColor = '#0A0A0A';
       document.body.style.color = '#F9FAFB';
     } else {
       document.body.classList.remove('dark-theme');
       document.body.classList.add('light-theme');
-      document.body.style.backgroundColor = '#F4F5F7';
+      document.body.style.backgroundColor = '#F7F7F7';
       document.body.style.color = '#111827';
     }
   }, [isDarkMode]);
@@ -73,6 +73,19 @@ export function App() {
           ...a,
           complianceStatus: 'approved',
           complianceLicenseId: licenseId
+        };
+      }
+      return a;
+    }));
+  };
+
+  const handleRejectAsset = (assetId: string, reason: string) => {
+    setAssets(prev => prev.map(a => {
+      if (a.id === assetId) {
+        return {
+          ...a,
+          complianceStatus: 'rejected',
+          rejectionReason: reason
         };
       }
       return a;
@@ -112,7 +125,7 @@ export function App() {
 
   return (
     <div className={`min-h-screen flex flex-col justify-between transition-colors duration-200 ${
-      isDarkMode ? 'bg-[#0B0E14] text-slate-100' : 'bg-[#F4F5F7] text-slate-900'
+      isDarkMode ? 'bg-[#0A0A0A] text-neutral-100' : 'bg-[#F7F7F7] text-neutral-900'
     }`}>
       
       {/* Navbar with Day/Night, Multi-language, Google Login & Role switcher */}
@@ -141,10 +154,13 @@ export function App() {
             assets={assets}
             lang={lang}
             onApproveAsset={handleApproveAsset}
+            onRejectAsset={handleRejectAsset}
+            isDarkMode={isDarkMode}
           />
         ) : activeTab === 'admin' ? (
           <AdminDashboard
             lang={lang}
+            isDarkMode={isDarkMode}
           />
         ) : (
           <>
@@ -172,7 +188,7 @@ export function App() {
 
             {/* How It Works Section */}
             <section id="how-it-works" className={`py-20 border-t transition-colors duration-200 ${
-              isDarkMode ? 'border-white/10 bg-slate-900/20' : 'border-slate-200 bg-white'
+              isDarkMode ? 'border-white/10 bg-neutral-900/20' : 'border-neutral-200 bg-white'
             }`}>
               <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="text-center max-w-2xl mx-auto mb-16">
@@ -180,12 +196,12 @@ export function App() {
                     فرآیند استاندارد ۴ مرحله‌ای
                   </span>
                   <h2 className={`text-3xl font-black mt-3 font-vazir ${
-                    isDarkMode ? 'text-white' : 'text-slate-900'
+                    isDarkMode ? 'text-white' : 'text-neutral-900'
                   }`}>
                     {t.howItWorks}
                   </h2>
                   <p className={`text-xs sm:text-sm mt-2 font-vazir ${
-                    isDarkMode ? 'text-slate-400' : 'text-slate-600'
+                    isDarkMode ? 'text-neutral-400' : 'text-neutral-600'
                   }`}>
                     انطباق با استانداردهای حقوقی، بررسی اسناد ثبتی توسط ناظر و صدور قراردادهای هوشمند مستقل
                   </p>
@@ -220,20 +236,20 @@ export function App() {
                   ].map((item, idx) => (
                     <div key={idx} className={`p-6 rounded-3xl border relative group transition-all ${
                       isDarkMode 
-                        ? 'bg-[#121622] border-slate-800 hover:border-[#F7931A]/40' 
-                        : 'bg-slate-50 border-slate-200 hover:border-[#F7931A]/60 shadow-xs'
+                        ? 'bg-[#121212] border-neutral-800 hover:border-[#F7931A]/40' 
+                        : 'bg-neutral-50 border-neutral-200 hover:border-[#F7931A]/60 shadow-xs'
                     }`}>
-                      <span className="text-3xl font-black text-slate-800 font-mono absolute top-4 left-4 group-hover:text-[#F7931A]/20 transition-colors">
+                      <span className="text-3xl font-black text-neutral-800 font-mono absolute top-4 left-4 group-hover:text-[#F7931A]/20 transition-colors">
                         {item.step}
                       </span>
                       <div className="w-10 h-10 rounded-xl bg-[#F7931A]/10 text-[#F7931A] flex items-center justify-center mb-4">
                         <item.icon className="w-5 h-5" />
                       </div>
                       <h3 className={`text-base font-bold mb-2 font-vazir ${
-                        isDarkMode ? 'text-white' : 'text-slate-900'
+                        isDarkMode ? 'text-white' : 'text-neutral-900'
                       }`}>{item.title}</h3>
                       <p className={`text-xs leading-relaxed font-vazir ${
-                        isDarkMode ? 'text-slate-400' : 'text-slate-600'
+                        isDarkMode ? 'text-neutral-400' : 'text-neutral-600'
                       }`}>{item.desc}</p>
                     </div>
                   ))}

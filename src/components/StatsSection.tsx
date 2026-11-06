@@ -8,22 +8,22 @@ interface StatsSectionProps {
 export const StatsSection: React.FC<StatsSectionProps> = ({ isDarkMode }) => {
   return (
     <section className={`py-12 border-b transition-colors duration-200 ${
-      isDarkMode ? 'border-white/10 bg-slate-900/30' : 'border-slate-200 bg-slate-50/60'
+      isDarkMode ? 'border-white/10 bg-neutral-900/30' : 'border-neutral-200 bg-neutral-50/60'
     }`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
           
           <div className={`p-6 rounded-3xl border text-right transition-colors ${
-            isDarkMode ? 'bg-[#121622] border-slate-800' : 'bg-white border-slate-200 shadow-xs'
+            isDarkMode ? 'bg-[#121212] border-neutral-800' : 'bg-white border-neutral-200 shadow-xs'
           }`}>
             <div className="flex items-center justify-between mb-3">
-              <span className={`text-xs font-medium font-vazir ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>ارزش کل دارایی‌ها (TVL)</span>
+              <span className={`text-xs font-medium font-vazir ${isDarkMode ? 'text-neutral-400' : 'text-neutral-500'}`}>ارزش کل دارایی‌ها (TVL)</span>
               <div className="w-8 h-8 rounded-xl bg-[#F7931A]/10 text-[#F7931A] flex items-center justify-center">
                 <DollarSign className="w-4 h-4" />
               </div>
             </div>
             <div className={`text-2xl sm:text-3xl font-black font-outfit tracking-tight ${
-              isDarkMode ? 'text-white' : 'text-slate-900'
+              isDarkMode ? 'text-white' : 'text-neutral-900'
             }`}>$۲,۹۵۰,۰۰۰</div>
             <p className="text-xs text-emerald-500 font-medium mt-2 flex items-center gap-1 font-vazir">
               <span>↑ ۱۸.۴٪ رشد در ماه جاری</span>
@@ -31,50 +31,50 @@ export const StatsSection: React.FC<StatsSectionProps> = ({ isDarkMode }) => {
           </div>
 
           <div className={`p-6 rounded-3xl border text-right transition-colors ${
-            isDarkMode ? 'bg-[#121622] border-slate-800' : 'bg-white border-slate-200 shadow-xs'
+            isDarkMode ? 'bg-[#121212] border-neutral-800' : 'bg-white border-neutral-200 shadow-xs'
           }`}>
             <div className="flex items-center justify-between mb-3">
-              <span className={`text-xs font-medium font-vazir ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>سرمایه‌گذاران فعال</span>
+              <span className={`text-xs font-medium font-vazir ${isDarkMode ? 'text-neutral-400' : 'text-neutral-500'}`}>سرمایه‌گذاران فعال</span>
               <div className="w-8 h-8 rounded-xl bg-[#F7931A]/10 text-[#F7931A] flex items-center justify-center">
                 <Users className="w-4 h-4" />
               </div>
             </div>
             <div className={`text-2xl sm:text-3xl font-black font-outfit tracking-tight ${
-              isDarkMode ? 'text-white' : 'text-slate-900'
+              isDarkMode ? 'text-white' : 'text-neutral-900'
             }`}>۱,۴۸۲ نفر</div>
-            <p className={`text-xs font-medium mt-2 font-vazir ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>
+            <p className={`text-xs font-medium mt-2 font-vazir ${isDarkMode ? 'text-neutral-400' : 'text-neutral-500'}`}>
               دارندگان توکن‌های RWA
             </p>
           </div>
 
           <div className={`p-6 rounded-3xl border text-right transition-colors ${
-            isDarkMode ? 'bg-[#121622] border-slate-800' : 'bg-white border-slate-200 shadow-xs'
+            isDarkMode ? 'bg-[#121212] border-neutral-800' : 'bg-white border-neutral-200 shadow-xs'
           }`}>
             <div className="flex items-center justify-between mb-3">
-              <span className={`text-xs font-medium font-vazir ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>میانگین سود سالانه (APY)</span>
+              <span className={`text-xs font-medium font-vazir ${isDarkMode ? 'text-neutral-400' : 'text-neutral-500'}`}>میانگین سود سالانه (APY)</span>
               <div className="w-8 h-8 rounded-xl bg-[#F7931A]/10 text-[#F7931A] flex items-center justify-center">
                 <TrendingUp className="w-4 h-4" />
               </div>
             </div>
             <div className={`text-2xl sm:text-3xl font-black font-outfit tracking-tight ${
-              isDarkMode ? 'text-white' : 'text-slate-900'
+              isDarkMode ? 'text-white' : 'text-neutral-900'
             }`}>۲۸.۲٪</div>
-            <p className={`text-xs font-medium mt-2 font-vazir ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>
+            <p className={`text-xs font-medium mt-2 font-vazir ${isDarkMode ? 'text-neutral-400' : 'text-neutral-500'}`}>
               ترکیب اجاره و رشد ارزش دارایی
             </p>
           </div>
 
           <div className={`p-6 rounded-3xl border text-right transition-colors ${
-            isDarkMode ? 'bg-[#121622] border-slate-800' : 'bg-white border-slate-200 shadow-xs'
+            isDarkMode ? 'bg-[#121212] border-neutral-800' : 'bg-white border-neutral-200 shadow-xs'
           }`}>
             <div className="flex items-center justify-between mb-3">
-              <span className={`text-xs font-medium font-vazir ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>شبکه‌های فعال</span>
+              <span className={`text-xs font-medium font-vazir ${isDarkMode ? 'text-neutral-400' : 'text-neutral-500'}`}>شبکه‌های فعال</span>
               <div className="w-8 h-8 rounded-xl bg-[#F7931A]/10 text-[#F7931A] flex items-center justify-center">
                 <Activity className="w-4 h-4" />
               </div>
             </div>
             <div className={`text-2xl sm:text-3xl font-black font-outfit tracking-tight ${
-              isDarkMode ? 'text-white' : 'text-slate-900'
+              isDarkMode ? 'text-white' : 'text-neutral-900'
             }`}>Polygon & BSC</div>
             <p className="text-xs text-[#F7931A] font-medium mt-2 font-vazir">
               تسویه لحظه‌ای با کارمزد ناچیز

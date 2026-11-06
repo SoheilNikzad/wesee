@@ -16,22 +16,22 @@ export const Footer: React.FC<FooterProps> = ({ lang }) => {
           
           <div className="space-y-3 md:col-span-1">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-xl bg-[#F7931A] text-black flex items-center justify-center font-bold">
-                <span className="font-outfit font-black text-lg">₿</span>
+              <div className="w-8 h-8 rounded-xl bg-[#F7931A] text-black flex items-center justify-center font-bold shadow-md shadow-[#F7931A]/20">
+                <span className="font-outfit font-black text-lg">W</span>
               </div>
               <span className="text-xl font-black font-comfortaa text-white">WeSee</span>
               <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-[#F7931A]/20 text-[#F7931A] border border-[#F7931A]/30 font-bold">
                 RWA
               </span>
             </div>
-            <p className="text-[11px] text-slate-400 leading-relaxed font-vazir">
+            <p className="text-[11px] text-neutral-400 leading-relaxed font-vazir">
               پلتفرم مرجع توکن‌سازی دارایی‌های واقعی (RWA) روی دامنه‌ رسمی <strong>wesee.ir</strong> با اتصال به شبکه‌های Polygon و BNB Chain.
             </p>
           </div>
 
           <div>
             <h5 className="font-bold text-white mb-3 text-sm font-outfit">دارایی‌های پشتیبانی‌شده</h5>
-            <ul className="space-y-2 text-slate-400 font-vazir">
+            <ul className="space-y-2 text-neutral-400 font-vazir">
               <li>املاک و مستغلات تجاری و مسکونی</li>
               <li>شمش طلا و ذخایر فلزات گرانبها</li>
               <li>نیروگاه‌های خورشیدی و انرژی پاک</li>
@@ -41,7 +41,7 @@ export const Footer: React.FC<FooterProps> = ({ lang }) => {
 
           <div>
             <h5 className="font-bold text-white mb-3 text-sm font-outfit">بلاکچین و استانداردها</h5>
-            <ul className="space-y-2 text-slate-400 font-mono text-[11px]">
+            <ul className="space-y-2 text-neutral-400 font-mono text-[11px]">
               <li>Polygon Network (PoS & zkEVM)</li>
               <li>BNB Smart Chain (BEP-20)</li>
               <li>ERC-3643 Permissioned Token</li>
@@ -52,11 +52,11 @@ export const Footer: React.FC<FooterProps> = ({ lang }) => {
           <div>
             <h5 className="font-bold text-white mb-3 text-sm font-outfit">زیرساخت و دامنه</h5>
             <div className="space-y-2">
-              <div className="p-3 rounded-xl bg-slate-900 border border-slate-800">
-                <span className="text-slate-400 block text-[10px]">دامنه متصل شده:</span>
+              <div className="p-3 rounded-xl bg-neutral-900 border border-neutral-800">
+                <span className="text-neutral-400 block text-[10px]">دامنه متصل شده:</span>
                 <span className="text-[#F7931A] font-mono font-bold text-sm">wesee.ir</span>
               </div>
-              <p className="text-[11px] text-slate-500 font-vazir">
+              <p className="text-[11px] text-neutral-500 font-vazir">
                 پشتیبانی از ورود با اکانت گوگل و سطوح دسترسی سرمایه‌گذار، مالک دارایی، ناظر و ادمین.
               </p>
             </div>
@@ -64,9 +64,9 @@ export const Footer: React.FC<FooterProps> = ({ lang }) => {
 
         </div>
 
-        <div className="border-t border-white/10 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px]">
+        <div className="border-t border-neutral-800 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px]">
           <p>© {new Date().getFullYear()} WeSee (wesee.ir) - تمامی حقوق محفوظ است.</p>
-          <div className="flex items-center gap-2 text-slate-500 font-mono">
+          <div className="flex items-center gap-2 text-neutral-500 font-mono">
             <span>BITCOIN ORANGE • BLACK • WHITE • GRAY</span>
           </div>
         </div>

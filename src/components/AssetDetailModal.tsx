@@ -63,7 +63,7 @@ export const AssetDetailModal: React.FC<AssetDetailModalProps> = ({ asset, onClo
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-5 left-5 p-2 rounded-xl bg-slate-800 text-slate-400 hover:text-white hover:bg-slate-700 transition-colors z-10"
+          className="absolute top-5 left-5 p-2 rounded-xl bg-neutral-800 text-neutral-400 hover:text-white hover:bg-neutral-700 transition-colors z-10"
         >
           <X className="w-5 h-5" />
         </button>
@@ -73,7 +73,7 @@ export const AssetDetailModal: React.FC<AssetDetailModalProps> = ({ asset, onClo
           <span className="px-3 py-1 rounded-full bg-[#F7931A]/10 text-[#F7931A] text-xs font-semibold">
             {asset.categoryLabel}
           </span>
-          <span className="px-2.5 py-1 rounded-full bg-slate-800 text-slate-300 text-xs font-mono uppercase">
+          <span className="px-2.5 py-1 rounded-full bg-neutral-800 text-neutral-300 text-xs font-mono uppercase">
             {asset.network}
           </span>
           {asset.complianceStatus === 'approved' && (
@@ -88,7 +88,7 @@ export const AssetDetailModal: React.FC<AssetDetailModalProps> = ({ asset, onClo
           {asset.title}
         </h2>
 
-        <div className="flex items-center gap-2 text-xs text-slate-400 mb-6 font-vazir">
+        <div className="flex items-center gap-2 text-xs text-neutral-400 mb-6 font-vazir">
           <MapPin className="w-4 h-4 text-[#F7931A] shrink-0" />
           <span>{asset.location}</span>
           <span>•</span>
@@ -100,7 +100,7 @@ export const AssetDetailModal: React.FC<AssetDetailModalProps> = ({ asset, onClo
           
           {/* Left Column */}
           <div className="lg:col-span-7 space-y-6">
-            <div className="rounded-2xl overflow-hidden h-64 bg-slate-900 border border-slate-800">
+            <div className="rounded-2xl overflow-hidden h-64 bg-neutral-900 border border-neutral-800">
               <img
                 src={asset.imageUrl}
                 alt={asset.title}
@@ -110,21 +110,21 @@ export const AssetDetailModal: React.FC<AssetDetailModalProps> = ({ asset, onClo
 
             <div>
               <h4 className="text-sm font-bold text-white mb-2 font-outfit">توضیحات و گزارش کارشناسی دارایی</h4>
-              <p className="text-xs text-slate-300 leading-relaxed bg-slate-900/50 p-4 rounded-2xl border border-slate-800 font-vazir">
+              <p className="text-xs text-neutral-300 leading-relaxed bg-neutral-900/50 p-4 rounded-2xl border border-neutral-800 font-vazir">
                 {asset.description}
               </p>
             </div>
 
             {/* Smart Contract Box */}
             {asset.contractAddress && (
-              <div className="p-3.5 rounded-2xl bg-black/40 border border-slate-800 flex items-center justify-between">
+              <div className="p-3.5 rounded-2xl bg-black/40 border border-neutral-800 flex items-center justify-between">
                 <div>
-                  <p className="text-[10px] text-slate-400">آدرس قرارداد هوشمند توکن روی شبکه {asset.network.toUpperCase()}:</p>
+                  <p className="text-[10px] text-neutral-400">آدرس قرارداد هوشمند توکن روی شبکه {asset.network.toUpperCase()}:</p>
                   <p className="font-mono text-xs text-[#F7931A] truncate max-w-xs sm:max-w-sm mt-0.5">{asset.contractAddress}</p>
                 </div>
                 <button
                   onClick={copyContract}
-                  className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 transition-colors"
+                  className="p-2 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-neutral-300 transition-colors"
                   title="کپی آدرس قرارداد"
                 >
                   {copiedAddr ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
@@ -142,15 +142,15 @@ export const AssetDetailModal: React.FC<AssetDetailModalProps> = ({ asset, onClo
                 {asset.documents.map((doc, idx) => (
                   <div
                     key={idx}
-                    className="flex items-center justify-between p-3 rounded-xl bg-slate-900/40 border border-slate-800 text-xs hover:border-slate-700 transition-colors"
+                    className="flex items-center justify-between p-3 rounded-xl bg-neutral-900/40 border border-neutral-800 text-xs hover:border-neutral-700 transition-colors"
                   >
                     <div className="flex items-center gap-2.5">
                       <div className="w-8 h-8 rounded-lg bg-red-500/10 text-red-400 flex items-center justify-center font-bold text-[10px]">
                         {doc.type}
                       </div>
                       <div>
-                        <p className="font-semibold text-slate-200">{doc.title}</p>
-                        <p className="text-[10px] text-slate-500">{doc.size}</p>
+                        <p className="font-semibold text-neutral-200">{doc.title}</p>
+                        <p className="text-[10px] text-neutral-500">{doc.size}</p>
                       </div>
                     </div>
                     <button 
@@ -169,16 +169,16 @@ export const AssetDetailModal: React.FC<AssetDetailModalProps> = ({ asset, onClo
 
           {/* Right Column: Calculator */}
           <div className="lg:col-span-5 space-y-6">
-            <div className="bg-slate-900/70 p-5 rounded-3xl border border-slate-800 space-y-5">
+            <div className="bg-neutral-900/70 p-5 rounded-3xl border border-neutral-800 space-y-5">
               
-              <div className="flex items-center justify-between pb-4 border-b border-slate-800">
-                <span className="text-xs text-slate-400">{t.tokenPrice}:</span>
+              <div className="flex items-center justify-between pb-4 border-b border-neutral-800">
+                <span className="text-xs text-neutral-400">{t.tokenPrice}:</span>
                 <span className="text-xl font-black text-[#F7931A] font-mono">${asset.tokenPriceUSD}</span>
               </div>
 
               {/* Calculator Input */}
               <div className="space-y-2">
-                <label className="text-xs font-semibold text-slate-300 flex justify-between font-outfit">
+                <label className="text-xs font-semibold text-neutral-300 flex justify-between font-outfit">
                   <span>تعداد سهم (توکن) جهت خرید:</span>
                   <span className="font-mono text-[#F7931A]">{investmentTokens} عدد</span>
                 </label>
@@ -192,24 +192,24 @@ export const AssetDetailModal: React.FC<AssetDetailModalProps> = ({ asset, onClo
                     className="w-full accent-[#F7931A] cursor-pointer"
                   />
                 </div>
-                <div className="flex justify-between text-[10px] text-slate-500 font-mono">
+                <div className="flex justify-between text-[10px] text-neutral-500 font-mono">
                   <span>۱ توکن (${asset.tokenPriceUSD})</span>
                   <span>۱۰۰ توکن (${asset.tokenPriceUSD * 100})</span>
                 </div>
               </div>
 
               {/* Projected Returns */}
-              <div className="p-4 rounded-2xl bg-black/50 border border-slate-800 space-y-2.5 text-xs">
+              <div className="p-4 rounded-2xl bg-black/50 border border-neutral-800 space-y-2.5 text-xs">
                 <div className="flex justify-between items-center">
-                  <span className="text-slate-400">مجموع سرمایه‌گذاری:</span>
+                  <span className="text-neutral-400">مجموع سرمایه‌گذاری:</span>
                   <span className="font-bold text-white font-mono text-sm">${totalCostUSD.toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-slate-400">نرخ سود سالانه (APY):</span>
+                  <span className="text-neutral-400">نرخ سود سالانه (APY):</span>
                   <span className="font-bold text-emerald-400 font-mono">+{asset.expectedAPY}٪</span>
                 </div>
-                <div className="flex justify-between items-center pt-2 border-t border-slate-800">
-                  <span className="text-slate-300 font-semibold">سود تخمینی ۱۲ ماه آینده:</span>
+                <div className="flex justify-between items-center pt-2 border-t border-neutral-800">
+                  <span className="text-neutral-300 font-semibold">سود تخمینی ۱۲ ماه آینده:</span>
                   <span className="font-bold text-[#F7931A] font-mono text-sm">+${annualEstimatedYieldUSD.toFixed(1)}</span>
                 </div>
               </div>
@@ -234,7 +234,7 @@ export const AssetDetailModal: React.FC<AssetDetailModalProps> = ({ asset, onClo
                 </button>
               )}
 
-              <p className="text-[10px] text-slate-500 text-center leading-relaxed">
+              <p className="text-[10px] text-neutral-500 text-center leading-relaxed">
                 مالکیت سهم دیجیتال با کد شناسه یکتا در شبکه {asset.network.toUpperCase()} صادر شده و قابلیت دریافت سود تقسیمی ماهانه را فراهم می‌سازد.
               </p>
 

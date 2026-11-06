@@ -37,6 +37,7 @@ export interface RWAAsset {
   status: 'active' | 'upcoming' | 'funded';
   complianceStatus: 'pending' | 'approved' | 'rejected';
   complianceLicenseId?: string;
+  rejectionReason?: string;
   minInvestmentUSD: number;
   issuerName?: string;
 }

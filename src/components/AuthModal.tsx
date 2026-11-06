@@ -90,12 +90,12 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-in fade-in duration-200">
-      <div className="relative w-full max-w-xl rounded-3xl border border-slate-700/80 shadow-2xl p-6 sm:p-8 bg-[#121620] text-slate-100 font-vazir">
+      <div className="relative w-full max-w-xl rounded-3xl border border-neutral-700/80 shadow-2xl p-6 sm:p-8 bg-[#141414] text-neutral-100 font-vazir">
         
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-5 left-5 p-2 rounded-xl bg-slate-800/80 text-slate-400 hover:text-white hover:bg-slate-700 transition-colors"
+          className="absolute top-5 left-5 p-2 rounded-xl bg-neutral-800/80 text-neutral-400 hover:text-white hover:bg-neutral-700 transition-colors"
         >
           <X className="w-5 h-5" />
         </button>
@@ -108,7 +108,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           <h2 className="text-2xl font-black font-vazir tracking-tight text-white">
             {lang === 'fa' ? 'ورود با اکانت گوگل به WeSee' : 'Sign in to WeSee with Google'}
           </h2>
-          <p className="text-xs text-slate-400 mt-1 max-w-sm mx-auto font-vazir">
+          <p className="text-xs text-neutral-400 mt-1 max-w-sm mx-auto font-vazir">
             {lang === 'fa' 
               ? 'اطلاعات ورود در دیتابیس Firebase و کالکشن Users ذخیره خواهد شد.'
               : 'Authentication details will be recorded in your Firebase Firestore users collection.'}
@@ -117,7 +117,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
         {/* Role Selector Cards */}
         <div className="space-y-2.5 mb-6">
-          <label className="block text-xs font-semibold text-slate-300 mb-1 font-vazir">
+          <label className="block text-xs font-semibold text-neutral-300 mb-1 font-vazir">
             {lang === 'fa' ? 'انتخاب نقش و سطح دسترسی شما:' : 'Select Access Role:'}
           </label>
           {rolesList.map((role) => {
@@ -130,12 +130,12 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 className={`p-3.5 rounded-2xl border transition-all cursor-pointer flex items-center justify-between gap-3 ${
                   isSelected
                     ? 'bg-[#F7931A]/10 border-[#F7931A] text-white shadow-lg shadow-[#F7931A]/10'
-                    : 'bg-slate-900/60 border-slate-800 text-slate-400 hover:border-slate-700 hover:text-slate-200'
+                    : 'bg-neutral-900/60 border-neutral-800 text-neutral-400 hover:border-neutral-700 hover:text-neutral-200'
                 }`}
               >
                 <div className="flex items-center gap-3">
                   <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
-                    isSelected ? 'bg-[#F7931A] text-black font-bold' : 'bg-slate-800 text-slate-400'
+                    isSelected ? 'bg-[#F7931A] text-black font-bold' : 'bg-neutral-800 text-neutral-400'
                   }`}>
                     <Icon className="w-5 h-5" />
                   </div>
@@ -143,17 +143,17 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                     <div className="flex items-center gap-2">
                       <span className="text-xs font-bold text-white font-vazir">{role.title}</span>
                       <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${
-                        isSelected ? 'bg-[#F7931A]/20 text-[#F7931A]' : 'bg-slate-800 text-slate-400'
+                        isSelected ? 'bg-[#F7931A]/20 text-[#F7931A]' : 'bg-neutral-800 text-neutral-400'
                       }`}>
                         {role.badge}
                       </span>
                     </div>
-                    <p className="text-[11px] text-slate-400 line-clamp-1 mt-0.5 font-vazir">{role.description}</p>
+                    <p className="text-[11px] text-neutral-400 line-clamp-1 mt-0.5 font-vazir">{role.description}</p>
                   </div>
                 </div>
 
                 <div className={`w-5 h-5 rounded-full border flex items-center justify-center shrink-0 ${
-                  isSelected ? 'border-[#F7931A] bg-[#F7931A]' : 'border-slate-700'
+                  isSelected ? 'border-[#F7931A] bg-[#F7931A]' : 'border-neutral-700'
                 }`}>
                   {isSelected && <div className="w-2 h-2 rounded-full bg-black" />}
                 </div>
@@ -167,7 +167,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           <button
             onClick={handleGoogleLogin}
             disabled={isLoggingIn}
-            className="w-full py-3.5 px-4 rounded-2xl bg-white hover:bg-slate-100 text-slate-900 font-bold text-xs sm:text-sm flex items-center justify-center gap-3 shadow-xl hover:shadow-2xl transition-all disabled:opacity-50 font-vazir"
+            className="w-full py-3.5 px-4 rounded-2xl bg-white hover:bg-neutral-100 text-neutral-900 font-bold text-xs sm:text-sm flex items-center justify-center gap-3 shadow-xl hover:shadow-2xl transition-all disabled:opacity-50 font-vazir"
           >
             {/* Real Official Google SVG Icon */}
             <svg className="w-5 h-5 shrink-0" viewBox="0 0 24 24">
@@ -195,7 +195,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             </span>
           </button>
 
-          <p className="text-[11px] text-slate-500 text-center font-vazir">
+          <p className="text-[11px] text-neutral-500 text-center font-vazir">
             متصل به Firebase Authentication و ذخیره شناسه کاربر در Firestore
           </p>
         </div>
