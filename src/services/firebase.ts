@@ -15,14 +15,14 @@ import {
 import { RWAAsset, UserRole, UserProfile } from '../types';
 import { INITIAL_RWA_ASSETS } from '../mockData';
 
-// Default Firebase Project configuration
+// Official Production Firebase Project configuration for wesee-ir
 const defaultFirebaseConfig = {
-  apiKey: "AIzaSyDummyKeyForWeSeePlatform2024",
-  authDomain: "wesee-rwa-platform.firebaseapp.com",
-  projectId: "wesee-rwa-platform",
-  storageBucket: "wesee-rwa-platform.appspot.com",
-  messagingSenderId: "102938475610",
-  appId: "1:102938475610:web:abcdef1234567890"
+  apiKey: "AIzaSyC3zJGhSq2AvAaUgzCKIuwyFk0AtKfN8Mk",
+  authDomain: "wesee-ir.firebaseapp.com",
+  projectId: "wesee-ir",
+  storageBucket: "wesee-ir.firebasestorage.app",
+  messagingSenderId: "218319045238",
+  appId: "1:218319045238:web:be305ff86907a1dc495557"
 };
 
 export const getActiveFirebaseConfig = () => {
