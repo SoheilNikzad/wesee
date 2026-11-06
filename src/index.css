@@ -1,0 +1,47 @@
+@import "tailwindcss";
+
+@theme {
+  --font-comfortaa: 'Comfortaa', cursive, sans-serif;
+  --font-outfit: 'Outfit', -apple-system, sans-serif;
+  --font-vazir: 'Vazirmatn', -apple-system, BlinkMacSystemFont, sans-serif;
+  
+  --color-btc: #F7931A;
+  --color-btc-hover: #E07E05;
+}
+
+:root {
+  font-family: 'Vazirmatn', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.font-comfortaa {
+  font-family: 'Comfortaa', cursive, sans-serif;
+}
+
+.font-outfit {
+  font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.font-vazir {
+  font-family: 'Vazirmatn', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* Neutral Pure Black & Crisp White (NO Blue / Slate Tint) */
+.dark-theme {
+  --app-bg: #0A0A0A;
+  --app-surface: #141414;
+  --app-surface-hover: #1C1C1C;
+  --app-border: #262626;
+  --app-text: #EDEDED;
+  --app-text-muted: #888888;
+  --app-card: #121212;
+}
+
+.light-theme {
+  --app-bg: #F7F7F7;
+  --app-surface: #FFFFFF;
+  --app-surface-hover: #F2F2F2;
+  --app-border: #E5E5E5;
+  --app-text: #171717;
+  --app-text-muted: #666666;
+  --app-card: #FFFFFF;
+}
