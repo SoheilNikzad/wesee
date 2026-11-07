@@ -62,6 +62,29 @@ export function App() {
     }
   }, [isDarkMode]);
 
+  // Sync assets live with Cloud Firestore
+  useEffect(() => {
+    const fetchLiveAssets = async () => {
+      try {
+        const { db, isRealFirebaseConnected } = await import('./services/firebase');
+        if (isRealFirebaseConnected && db) {
+          const { collection, getDocs } = await import('firebase/firestore');
+          const snap = await getDocs(collection(db, 'assets'));
+          if (!snap.empty) {
+            const list: RWAAsset[] = [];
+            snap.forEach(d => list.push(d.data() as RWAAsset));
+            if (list.length > 0) {
+              setAssets(list);
+            }
+          }
+        }
+      } catch (e) {
+        console.warn("Firestore live load fallback:", e);
+      }
+    };
+    fetchLiveAssets();
+  }, []);
+
   const handleAssetCreated = (newAsset: RWAAsset) => {
     setAssets(prev => [newAsset, ...prev]);
   };
