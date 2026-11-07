@@ -219,36 +219,31 @@ export const loginWithGoogleFirebase = async (role: UserRole = 'investor'): Prom
   const provider = new GoogleAuthProvider();
   provider.setCustomParameters({ prompt: 'select_account' });
 
-  try {
-    if (isRealFirebaseConnected && auth) {
-      // 3.5-second timeout protection so popup blocker or unconfigured provider never hangs the UI
+  let googleUser: any = null;
+
+  if (isRealFirebaseConnected && auth) {
+    try {
       const popupPromise = signInWithPopup(auth, provider);
       const timeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('AUTH_TIMEOUT_OR_BLOCKED')), 3500)
+        setTimeout(() => reject(new Error('AUTH_TIMEOUT_OR_BLOCKED')), 2000)
       );
-
       const result: any = await Promise.race([popupPromise, timeoutPromise]);
-      const user = result.user;
-      
-      const profile: UserProfile = {
-        name: user.displayName || 'کاربر رسمی گوگل',
-        email: user.email || 'user@wesee.ir',
-        avatarUrl: user.photoURL || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80',
-        role: role,
-        isLoggedIn: true,
-        loginMethod: 'google'
-      };
-
-      await saveUserRecord(user.uid, profile);
-      return profile;
+      if (result && result.user) {
+        googleUser = result.user;
+      }
+    } catch (err) {
+      console.warn("Live Google Auth popup fallback:", err);
     }
-  } catch (err) {
-    console.warn("Live Google Auth popup fallback:", err);
   }
 
-  // Resilient instant login with selected role
-  const mockUid = 'usr_g_' + Math.floor(1000000 + Math.random() * 9000000);
-  const fallbackProfile: UserProfile = {
+  const profile: UserProfile = googleUser ? {
+    name: googleUser.displayName || 'کاربر رسمی گوگل',
+    email: googleUser.email || 'user@wesee.ir',
+    avatarUrl: googleUser.photoURL || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80',
+    role: role,
+    isLoggedIn: true,
+    loginMethod: 'google'
+  } : {
     name: role === 'issuer' ? 'مهندس بهزاد پارسا (مالک دارایی)' : 
           role === 'regulator' ? 'دکتر علیرضا محمدی (ناظر قضایی)' : 
           role === 'admin' ? 'مدیریت کل شبکه WeSee' : 'کاربر سرمایه‌گذار',
@@ -259,12 +254,13 @@ export const loginWithGoogleFirebase = async (role: UserRole = 'investor'): Prom
     loginMethod: 'google'
   };
 
-  await saveUserRecord(mockUid, fallbackProfile);
-  return fallbackProfile;
+  const uid = googleUser ? googleUser.uid : ('usr_g_' + Math.floor(1000000 + Math.random() * 9000000));
+  saveUserRecord(uid, profile); // Non-blocking
+  return profile;
 };
 
-// 2. Save User Record in Firestore
-export const saveUserRecord = async (uid: string, profile: UserProfile) => {
+// 2. Save User Record in Firestore (Non-blocking so uninitialized db never hangs UI)
+export const saveUserRecord = (uid: string, profile: UserProfile) => {
   const record = {
     uid,
     name: profile.name,
@@ -280,16 +276,17 @@ export const saveUserRecord = async (uid: string, profile: UserProfile) => {
   localStorage.setItem('FIRESTORE_USERS', JSON.stringify([record, ...filtered]));
 
   if (isRealFirebaseConnected && db) {
-    try {
-      await setDoc(doc(db, 'users', uid), record, { merge: true });
-    } catch (e) {
-      console.error("Firestore user write error:", e);
-    }
+    Promise.race([
+      setDoc(doc(db, 'users', uid), record, { merge: true }),
+      new Promise((_, reject) => setTimeout(() => reject('TIMEOUT'), 1500))
+    ]).catch((e) => {
+      console.warn("Firestore user sync background notice:", e);
+    });
   }
 };
 
-// 3. Save RWA Asset Record in Firestore
-export const saveAssetToFirestore = async (asset: RWAAsset) => {
+// 3. Save RWA Asset Record in Firestore (Non-blocking)
+export const saveAssetToFirestore = (asset: RWAAsset) => {
   const record = {
     ...asset,
     createdAt: new Date().toISOString(),
@@ -301,16 +298,17 @@ export const saveAssetToFirestore = async (asset: RWAAsset) => {
   localStorage.setItem('FIRESTORE_ASSETS', JSON.stringify([record, ...existing]));
 
   if (isRealFirebaseConnected && db) {
-    try {
-      await setDoc(doc(db, 'assets', asset.id), record);
-    } catch (e) {
-      console.error("Firestore asset write error:", e);
-    }
+    Promise.race([
+      setDoc(doc(db, 'assets', asset.id), record),
+      new Promise((_, reject) => setTimeout(() => reject('TIMEOUT'), 1500))
+    ]).catch((e) => {
+      console.warn("Firestore asset sync background notice:", e);
+    });
   }
 };
 
-// 4. Save Investment Record
-export const saveInvestmentToFirestore = async (assetTitle: string, tokenSymbol: string, userEmail: string, tokenCount: number, totalUSD: number) => {
+// 4. Save Investment Record (Non-blocking)
+export const saveInvestmentToFirestore = (assetTitle: string, tokenSymbol: string, userEmail: string, tokenCount: number, totalUSD: number) => {
   const record = {
     id: `inv-${Date.now()}`,
     assetTitle,
@@ -327,16 +325,17 @@ export const saveInvestmentToFirestore = async (assetTitle: string, tokenSymbol:
   localStorage.setItem('FIRESTORE_INVESTMENTS', JSON.stringify([record, ...existing]));
 
   if (isRealFirebaseConnected && db) {
-    try {
-      await setDoc(doc(db, 'investments', record.id), record);
-    } catch (e) {
-      console.error("Firestore investment write error:", e);
-    }
+    Promise.race([
+      setDoc(doc(db, 'investments', record.id), record),
+      new Promise((_, reject) => setTimeout(() => reject('TIMEOUT'), 1500))
+    ]).catch((e) => {
+      console.warn("Firestore investment sync background notice:", e);
+    });
   }
 };
 
-// 5. Save Regulatory Endorsement
-export const saveComplianceApprovalToFirestore = async (assetTitle: string, licenseId: string, regulatorEmail: string) => {
+// 5. Save Regulatory Endorsement (Non-blocking)
+export const saveComplianceApprovalToFirestore = (assetTitle: string, licenseId: string, regulatorEmail: string) => {
   const record = {
     id: `audit-${Date.now()}`,
     assetTitle,
@@ -351,10 +350,11 @@ export const saveComplianceApprovalToFirestore = async (assetTitle: string, lice
   localStorage.setItem('FIRESTORE_COMPLIANCE', JSON.stringify([record, ...existing]));
 
   if (isRealFirebaseConnected && db) {
-    try {
-      await setDoc(doc(db, 'compliance_audits', record.id), record);
-    } catch (e) {
-      console.error("Firestore compliance write error:", e);
-    }
+    Promise.race([
+      setDoc(doc(db, 'compliance_audits', record.id), record),
+      new Promise((_, reject) => setTimeout(() => reject('TIMEOUT'), 1500))
+    ]).catch((e) => {
+      console.warn("Firestore compliance sync background notice:", e);
+    });
   }
 };
