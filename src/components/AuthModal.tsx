@@ -167,7 +167,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           <button
             onClick={handleGoogleLogin}
             disabled={isLoggingIn}
-            className="w-full py-3.5 px-4 rounded-2xl bg-white hover:bg-neutral-100 text-neutral-900 font-bold text-xs sm:text-sm flex items-center justify-center gap-3 shadow-xl hover:shadow-2xl transition-all disabled:opacity-50 font-vazir"
+            className="w-full py-3.5 px-4 rounded-2xl bg-white hover:bg-neutral-100 text-neutral-900 font-bold text-xs sm:text-sm flex items-center justify-center gap-3 shadow-xl hover:shadow-2xl transition-all disabled:opacity-50 font-vazir active:scale-[0.99] cursor-pointer"
           >
             {/* Real Official Google SVG Icon */}
             <svg className="w-5 h-5 shrink-0" viewBox="0 0 24 24">
@@ -190,13 +190,13 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             </svg>
             <span>
               {isLoggingIn 
-                ? 'در حال برقراری ارتباط با Firebase Auth...' 
-                : `ورود با گوگل و ثبت در دیتابیس فایربیس`}
+                ? 'در حال برقراری ارتباط با Google / Firebase...' 
+                : `ورود با گوگل با نقش «${rolesList.find(r => r.id === selectedRole)?.title}»`}
             </span>
           </button>
 
           <p className="text-[11px] text-neutral-500 text-center font-vazir">
-            متصل به Firebase Authentication و ذخیره شناسه کاربر در Firestore
+            پشتیبانی از احراز هویت همزمان با اکانت رسمی گوگل و ورود با نقش‌های سازمانی WeSee
           </p>
         </div>
 

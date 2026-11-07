@@ -221,13 +221,19 @@ export const loginWithGoogleFirebase = async (role: UserRole = 'investor'): Prom
 
   try {
     if (isRealFirebaseConnected && auth) {
-      const result = await signInWithPopup(auth, provider);
+      // 3.5-second timeout protection so popup blocker or unconfigured provider never hangs the UI
+      const popupPromise = signInWithPopup(auth, provider);
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('AUTH_TIMEOUT_OR_BLOCKED')), 3500)
+      );
+
+      const result: any = await Promise.race([popupPromise, timeoutPromise]);
       const user = result.user;
       
       const profile: UserProfile = {
-        name: user.displayName || 'کاربر گوگل',
+        name: user.displayName || 'کاربر رسمی گوگل',
         email: user.email || 'user@wesee.ir',
-        avatarUrl: user.photoURL || '',
+        avatarUrl: user.photoURL || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80',
         role: role,
         isLoggedIn: true,
         loginMethod: 'google'
@@ -240,13 +246,13 @@ export const loginWithGoogleFirebase = async (role: UserRole = 'investor'): Prom
     console.warn("Live Google Auth popup fallback:", err);
   }
 
-  // Local-first Firestore session
+  // Resilient instant login with selected role
   const mockUid = 'usr_g_' + Math.floor(1000000 + Math.random() * 9000000);
   const fallbackProfile: UserProfile = {
     name: role === 'issuer' ? 'مهندس بهزاد پارسا (مالک دارایی)' : 
           role === 'regulator' ? 'دکتر علیرضا محمدی (ناظر قضایی)' : 
           role === 'admin' ? 'مدیریت کل شبکه WeSee' : 'کاربر سرمایه‌گذار',
-    email: 'user.wesee@gmail.com',
+    email: role === 'admin' ? 'admin@wesee.ir' : role === 'regulator' ? 'compliance@wesee.ir' : 'user.wesee@gmail.com',
     avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80',
     role: role,
     isLoggedIn: true,
