@@ -276,16 +276,13 @@ export const saveUserRecord = (uid: string, profile: UserProfile) => {
   localStorage.setItem('FIRESTORE_USERS', JSON.stringify([record, ...filtered]));
 
   if (isRealFirebaseConnected && db) {
-    Promise.race([
-      setDoc(doc(db, 'users', uid), record, { merge: true }),
-      new Promise((_, reject) => setTimeout(() => reject('TIMEOUT'), 1500))
-    ]).catch((e) => {
-      console.warn("Firestore user sync background notice:", e);
+    setDoc(doc(db, 'users', uid), record, { merge: true }).catch((e) => {
+      console.warn("Firestore user sync notice:", e);
     });
   }
 };
 
-// 3. Save RWA Asset Record in Firestore (Non-blocking)
+// 3. Save RWA Asset Record in Firestore
 export const saveAssetToFirestore = (asset: RWAAsset) => {
   const record = {
     ...asset,
@@ -298,16 +295,13 @@ export const saveAssetToFirestore = (asset: RWAAsset) => {
   localStorage.setItem('FIRESTORE_ASSETS', JSON.stringify([record, ...existing]));
 
   if (isRealFirebaseConnected && db) {
-    Promise.race([
-      setDoc(doc(db, 'assets', asset.id), record),
-      new Promise((_, reject) => setTimeout(() => reject('TIMEOUT'), 1500))
-    ]).catch((e) => {
-      console.warn("Firestore asset sync background notice:", e);
+    setDoc(doc(db, 'assets', asset.id), record).catch((e) => {
+      console.warn("Firestore asset sync notice:", e);
     });
   }
 };
 
-// 4. Save Investment Record (Non-blocking)
+// 4. Save Investment Record
 export const saveInvestmentToFirestore = (assetTitle: string, tokenSymbol: string, userEmail: string, tokenCount: number, totalUSD: number) => {
   const record = {
     id: `inv-${Date.now()}`,
@@ -325,16 +319,13 @@ export const saveInvestmentToFirestore = (assetTitle: string, tokenSymbol: strin
   localStorage.setItem('FIRESTORE_INVESTMENTS', JSON.stringify([record, ...existing]));
 
   if (isRealFirebaseConnected && db) {
-    Promise.race([
-      setDoc(doc(db, 'investments', record.id), record),
-      new Promise((_, reject) => setTimeout(() => reject('TIMEOUT'), 1500))
-    ]).catch((e) => {
-      console.warn("Firestore investment sync background notice:", e);
+    setDoc(doc(db, 'investments', record.id), record).catch((e) => {
+      console.warn("Firestore investment sync notice:", e);
     });
   }
 };
 
-// 5. Save Regulatory Endorsement (Non-blocking)
+// 5. Save Regulatory Endorsement
 export const saveComplianceApprovalToFirestore = (assetTitle: string, licenseId: string, regulatorEmail: string) => {
   const record = {
     id: `audit-${Date.now()}`,
@@ -350,11 +341,8 @@ export const saveComplianceApprovalToFirestore = (assetTitle: string, licenseId:
   localStorage.setItem('FIRESTORE_COMPLIANCE', JSON.stringify([record, ...existing]));
 
   if (isRealFirebaseConnected && db) {
-    Promise.race([
-      setDoc(doc(db, 'compliance_audits', record.id), record),
-      new Promise((_, reject) => setTimeout(() => reject('TIMEOUT'), 1500))
-    ]).catch((e) => {
-      console.warn("Firestore compliance sync background notice:", e);
+    setDoc(doc(db, 'compliance_audits', record.id), record).catch((e) => {
+      console.warn("Firestore compliance sync notice:", e);
     });
   }
 };
