@@ -68,3 +68,61 @@ export interface TokenizeFormData {
   canBurn: boolean;
   canPause: boolean;
 }
+
+export type MarketType = 'iran-cex' | 'global-cex' | 'dex';
+
+export interface TargetMarket {
+  id: string;
+  name: string;
+  nameFa: string;
+  type: MarketType;
+  badge: string;
+  description: string;
+  icon?: string;
+  popular?: boolean;
+}
+
+export type ListingStatus = 'submitted' | 'under_review' | 'docs_required' | 'sent_to_exchanges' | 'approved' | 'rejected';
+
+export interface ListingApplication {
+  id: string;
+  trackingCode: string;
+  createdAt: string;
+  status: ListingStatus;
+  statusLabelFa: string;
+  targetMarkets: string[]; // Market IDs
+  
+  // Section 1: Applicant info
+  requestTopic: string;
+  applicantRole: string;
+  entityName: string;
+  nationalId?: string;
+  representativeName: string;
+  representativePhone: string;
+  representativeEmail: string;
+  projectWebsite: string;
+  
+  // Section 2: Token & Asset info
+  tokenName: string;
+  tokenSymbol: string;
+  tokenCurrentStatus: string;
+  underlyingAssetCategory: string;
+  underlyingAssetIntro: string;
+  tokenHolderRights: string[];
+  assetOwnerOrObligor: string;
+  ownershipProofStatus: string;
+  tokenEconomicsSummary: string;
+  blockchainNetwork: string;
+  smartContractAddress?: string;
+  
+  // Section 3: Legal & Readiness
+  regulatoryStatus: string;
+  availableDocuments: string[];
+  documentsDriveLink?: string;
+  expectedListingTimeline: string;
+  
+  // Section 4: Notes
+  additionalNotes?: string;
+  termsConfirmed: boolean;
+}
+

@@ -178,3 +178,181 @@ export const INITIAL_RWA_ASSETS: RWAAsset[] = [
     minInvestmentUSD: 20
   }
 ];
+
+export const AVAILABLE_MARKETS: import('./types').TargetMarket[] = [
+  // CEX Iran
+  {
+    id: 'abantether',
+    name: 'AbanTether',
+    nameFa: 'آبان‌تتر',
+    type: 'iran-cex',
+    badge: 'پیشنهادی ایران',
+    description: 'بازار پیشرو تبادل توکن با نقدینگی بالا، تسویه ریالی آنی و پذیرنده پروژه‌های ملی',
+    popular: true
+  },
+  {
+    id: 'nobitex',
+    name: 'Nobitex',
+    nameFa: 'نوبیتکس',
+    type: 'iran-cex',
+    badge: 'بازار معاملاتی',
+    description: 'بازار معاملاتی پیشرفته، دفتر سفارشات (Order Book) فعال و بیشترین کاربر داخلی',
+    popular: true
+  },
+  {
+    id: 'wallex',
+    name: 'Wallex',
+    nameFa: 'والکس',
+    type: 'iran-cex',
+    badge: 'امنیت نهادی',
+    description: 'پلتفرم تبادل کریپتو با استانداردهای ذخیره‌سازی سرد و کیف‌پول‌های امن اختصاصی'
+  },
+  {
+    id: 'tabdeel',
+    name: 'Tabdeel',
+    nameFa: 'تبدیل',
+    type: 'iran-cex',
+    badge: 'تنوع بازارها',
+    description: 'تنوع جفت‌ارزهای معاملاتی با ابزارهای مدیریت ریسک و استاپ‌لاس'
+  },
+  {
+    id: 'bitpin',
+    name: 'Bitpin',
+    nameFa: 'بیت‌پین',
+    type: 'iran-cex',
+    badge: 'جامعه جوان',
+    description: 'پلتفرم سریع خرید و فروش کریپتو با پشتیبانی فعال و کامیونیتی وب۳'
+  },
+
+  // Global CEX (Iran-friendly / Accessible)
+  {
+    id: 'coinex',
+    name: 'CoinEx',
+    nameFa: 'کوینکس',
+    type: 'global-cex',
+    badge: 'بین‌المللی سازگار',
+    description: 'اکسچنج جهانی با دسترسی آزاد برای کاربران ایرانی، پشتیبانی زبان فارسی و بیش از ۷۰۰ بازار',
+    popular: true
+  },
+  {
+    id: 'lbank',
+    name: 'LBank',
+    nameFa: 'ال‌بانک',
+    type: 'global-cex',
+    badge: 'مارکت جهانی',
+    description: 'صرافی رده‌بالا با دسترسی سریع به سرمایه‌گذاران بین‌المللی و کارمزد رقابتی'
+  },
+  {
+    id: 'bingx',
+    name: 'BingX',
+    nameFa: 'بینگ‌ایکس',
+    type: 'global-cex',
+    badge: 'اسپات و فیوچرز',
+    description: 'پلتفرم محبوب بین‌المللی با ابزارهای کپی‌ترید و حجم معاملات بالا'
+  },
+  {
+    id: 'mexc',
+    name: 'MEXC Global',
+    nameFa: 'مکسی',
+    type: 'global-cex',
+    badge: 'لیستینگ پرسرعت',
+    description: 'پایگاه اصلی معرفی و کشف توکن‌های نوظهور و پروژه‌های وب۳ در جهان'
+  },
+
+  // Decentralized DEX
+  {
+    id: 'uniswap',
+    name: 'Uniswap V3',
+    nameFa: 'یونی‌سواپ',
+    type: 'dex',
+    badge: 'عمیق‌ترین نقدینگی DEX',
+    description: 'استخر نقدینگی خودکار (AMM) روی شبکه‌های پالیگان و اتریوم بدون نیاز به مجوز واسطه',
+    popular: true
+  },
+  {
+    id: 'pancakeswap',
+    name: 'PancakeSwap',
+    nameFa: 'پنکیک‌سواپ',
+    type: 'dex',
+    badge: 'DEX شماره ۱ بوشبکه BNB',
+    description: 'بزرگترین صرافی غیرمتمرکز شبکه بایننس اسمارت چین با کارمزد بسیار پایین'
+  },
+  {
+    id: 'quickswap',
+    name: 'QuickSwap',
+    nameFa: 'کوئیک‌سواپ',
+    type: 'dex',
+    badge: 'بومی پالیگان',
+    description: 'صرافی غیرمتمرکز سریع و اختصاصی شبکه Polygon با کارمزد صدم سنت'
+  }
+];
+
+export const INITIAL_LISTING_APPLICATIONS: import('./types').ListingApplication[] = [
+  {
+    id: 'lst-app-1',
+    trackingCode: 'LST-WSEE-8841',
+    createdAt: '۱۴۰۳/۰۸/۱۶',
+    status: 'sent_to_exchanges',
+    statusLabelFa: 'ارسال مدارک به کارگروه پذیرش',
+    targetMarkets: ['abantether', 'coinex', 'uniswap'],
+    requestTopic: 'پذیرش توکن منتشرشده در بازار آبان',
+    applicantRole: 'ناشر توکن',
+    entityName: 'هلدینگ توسعه سرمایه فرشته',
+    nationalId: '14008920192',
+    representativeName: 'مهندس بهزاد پارسا',
+    representativePhone: '09121112233',
+    representativeEmail: 'b.parsa.holding@gmail.com',
+    projectWebsite: 'https://wesee.ir',
+    tokenName: 'WeSee Fereshteh Tower 402',
+    tokenSymbol: 'WSEE-FST-402',
+    tokenCurrentStatus: 'منتشر شده و در حال معامله است',
+    underlyingAssetCategory: 'املاک و مستغلات',
+    underlyingAssetIntro: 'یک واحد اداری تجاری در طبقه چهارم مجتمع تجاری آسمان فرشته به متراژ ۱۸۵ متر با سند رسمی تک برگ',
+    tokenHolderRights: ['مالکیت تمام یا بخشی از دارایی', 'سهم از درآمد یا منافع اقتصادی'],
+    assetOwnerOrObligor: 'هلدینگ توسعه سرمایه فرشته',
+    ownershipProofStatus: 'بله، سند تک‌برگ و کارشناسی رسمی دادگستری ضمیمه شده است',
+    tokenEconomicsSummary: 'ارزش ۲.۵ میلیون دلار، ۵۰ هزار توکن با قیمت پایه ۵۰ دلار',
+    blockchainNetwork: 'polygon',
+    smartContractAddress: '0x742d35Cc6634C0532925a3b844Bc454e4438f44e',
+    regulatoryStatus: 'مجوز یا تأییدیه مرتبط دریافت شده است',
+    availableDocuments: ['معرفی‌نامه یا طرح تجاری پروژه', 'سپیدنامه (Whitepaper)', 'اسناد مالکیت یا حقوق دارایی پایه', 'گزارش ممیزی امنیتی'],
+    documentsDriveLink: 'https://drive.google.com/drive/folders/1vLQyb1Auzk3DYmOc2zRiaYWO2oCbsb5o',
+    expectedListingTimeline: 'هم‌اکنون آماده بررسی هستیم',
+    additionalNotes: 'تقاضای راه‌اندازی جفت ارز WSEE/USDT و WSEE/IRT در بازار تتری و تومانی',
+    termsConfirmed: true
+  },
+  {
+    id: 'lst-app-2',
+    trackingCode: 'LST-WSEE-4420',
+    createdAt: '۱۴۰۳/۰۸/۱۸',
+    status: 'under_review',
+    statusLabelFa: 'در حال ارزیابی حقوقی و فنی اولیه',
+    targetMarkets: ['abantether', 'nobitex', 'lbank'],
+    requestTopic: 'پذیرش توکن در حال انتشار یا آماده انتشار',
+    applicantRole: 'مالک دارایی یا حق پایه',
+    entityName: 'کنسرسیوم طلای پارسیان',
+    nationalId: '10103492810',
+    representativeName: 'سید محمد حسینی',
+    representativePhone: '09123334455',
+    representativeEmail: 'm.hosseini.gold@gmail.com',
+    projectWebsite: 'https://wesee.ir',
+    tokenName: 'WeSee Physical Gold Backed',
+    tokenSymbol: 'WSEE-GOLD-01',
+    tokenCurrentStatus: 'طراحی شده و آماده انتشار است',
+    underlyingAssetCategory: 'کالاها، فلزات و مواد اولیه',
+    underlyingAssetIntro: 'سبد شمش طلای ۲۴ عیار استاندارد سپرده‌گذاری‌شده در خزانه رسمی با بیمه‌نامه معتبر سرقت',
+    tokenHolderRights: ['مالکیت تمام یا بخشی از دارایی', 'حق بازخرید یا تسویه طبق قرارداد'],
+    assetOwnerOrObligor: 'خزانه امانات امنیتی شمش مرکزی',
+    ownershipProofStatus: 'بله، قبض انبار رسمی و شناسه آزمایشگاه ری‌گیری شمس',
+    tokenEconomicsSummary: '۱ میلیون دلار شمش با پشتوانه فیزیکی دقیق هر توکن معادل ۰.۲۵ گرم طلای خالص',
+    blockchainNetwork: 'bsc',
+    smartContractAddress: '0x5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f',
+    regulatoryStatus: 'در محیط آزمون تنظیم‌گری (Sandbox) قرار دارد',
+    availableDocuments: ['معرفی‌نامه یا طرح تجاری پروژه', 'اسناد مالکیت یا حقوق دارایی پایه', 'اسناد ثبتی و حقوقی ناشر'],
+    documentsDriveLink: 'https://drive.google.com/drive/folders/1vLQyb1Auzk3DYmOc2zRiaYWO2oCbsb5o',
+    expectedListingTimeline: 'تا یک ماه آینده',
+    additionalNotes: 'آمادگی همکاری برای بازارگردانی و ایجاد عمق سفارشات',
+    termsConfirmed: true
+  }
+];
+

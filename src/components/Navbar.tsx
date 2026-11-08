@@ -35,6 +35,7 @@ interface NavbarProps {
   activeTab: 'catalog' | 'regulator' | 'admin';
   setActiveTab: (tab: 'catalog' | 'regulator' | 'admin') => void;
   onOpenFirebaseModal: () => void;
+  onOpenListingWizard: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -52,7 +53,8 @@ export const Navbar: React.FC<NavbarProps> = ({
   onScrollToCatalog,
   activeTab,
   setActiveTab,
-  onOpenFirebaseModal
+  onOpenFirebaseModal,
+  onOpenListingWizard
 }) => {
   const t = TRANSLATIONS[lang];
   const [isLangMenuOpen, setIsLangMenuOpen] = useState(false);
@@ -139,6 +141,19 @@ export const Navbar: React.FC<NavbarProps> = ({
               }`}
             >
               {t.exploreAssets}
+            </button>
+
+            <button
+              onClick={onOpenListingWizard}
+              className={`transition-colors py-1 flex items-center gap-1.5 cursor-pointer font-bold ${
+                isDarkMode ? 'text-neutral-200 hover:text-[#F7931A]' : 'text-neutral-700 hover:text-[#F7931A]'
+              }`}
+            >
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+              <span>پذیرش در صرافی‌ها</span>
+              <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+                آبان‌تتر • CEX
+              </span>
             </button>
 
             {(userProfile.role === 'issuer' || userProfile.role === 'admin') && (

@@ -9,9 +9,10 @@ import { AuthModal } from './components/AuthModal';
 import { FirebaseInspectorModal } from './components/FirebaseInspectorModal';
 import { RegulatorDashboard } from './components/RegulatorDashboard';
 import { AdminDashboard } from './components/AdminDashboard';
+import { ListingWizard } from './components/ListingWizard';
 import { Footer } from './components/Footer';
-import { INITIAL_RWA_ASSETS } from './mockData';
-import { RWAAsset, BlockchainNetwork, UserRole, UserProfile } from './types';
+import { INITIAL_RWA_ASSETS, INITIAL_LISTING_APPLICATIONS } from './mockData';
+import { RWAAsset, BlockchainNetwork, UserRole, UserProfile, ListingApplication, ListingStatus } from './types';
 import { Language, TRANSLATIONS } from './translations';
 import { 
   FileCheck2, 
@@ -29,7 +30,32 @@ export function App() {
   const [isWizardOpen, setIsWizardOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isFirebaseModalOpen, setIsFirebaseModalOpen] = useState(false);
+  const [isListingWizardOpen, setIsListingWizardOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'catalog' | 'regulator' | 'admin'>('catalog');
+
+  const [listingApplications, setListingApplications] = useState<ListingApplication[]>(() => {
+    const saved = localStorage.getItem('WESEE_LISTINGS');
+    if (saved) {
+      try { return JSON.parse(saved); } catch (e) {}
+    }
+    return INITIAL_LISTING_APPLICATIONS;
+  });
+
+  const handleListingApplicationCreated = (newApp: ListingApplication) => {
+    setListingApplications(prev => {
+      const updated = [newApp, ...prev];
+      localStorage.setItem('WESEE_LISTINGS', JSON.stringify(updated));
+      return updated;
+    });
+  };
+
+  const handleUpdateListingStatus = (id: string, newStatus: ListingStatus) => {
+    setListingApplications(prev => {
+      const updated = prev.map(a => a.id === id ? { ...a, status: newStatus } : a);
+      localStorage.setItem('WESEE_LISTINGS', JSON.stringify(updated));
+      return updated;
+    });
+  };
 
   const [userProfile, setUserProfile] = useState<UserProfile>({
     name: 'کاربر مهمان',
@@ -203,6 +229,7 @@ export function App() {
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         onOpenFirebaseModal={() => setIsFirebaseModalOpen(true)}
+        onOpenListingWizard={() => setIsListingWizardOpen(true)}
       />
 
       <main className="flex-1">
@@ -219,6 +246,8 @@ export function App() {
           <AdminDashboard
             lang={lang}
             isDarkMode={isDarkMode}
+            listingApplications={listingApplications}
+            onUpdateListingStatus={handleUpdateListingStatus}
           />
         ) : (
           <>
@@ -227,6 +256,7 @@ export function App() {
               lang={lang}
               onOpenWizard={() => setIsWizardOpen(true)}
               onExplore={scrollToCatalog}
+              onOpenListingWizard={() => setIsListingWizardOpen(true)}
               canTokenize={userProfile.role === 'issuer' || userProfile.role === 'admin'}
               isDarkMode={isDarkMode}
             />
@@ -332,6 +362,14 @@ export function App() {
         defaultNetwork={network}
         onAssetCreated={handleAssetCreated}
         lang={lang}
+      />
+
+      {/* Token Listing & Market Application Wizard Modal */}
+      <ListingWizard
+        isOpen={isListingWizardOpen}
+        onClose={() => setIsListingWizardOpen(false)}
+        onApplicationCreated={handleListingApplicationCreated}
+        isDarkMode={isDarkMode}
       />
 
       {/* Google Login & Role Modal */}
