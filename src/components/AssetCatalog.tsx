@@ -42,10 +42,11 @@ export const AssetCatalog: React.FC<AssetCatalogProps> = ({
 
   const filteredAssets = assets.filter((asset) => {
     const matchesCat = selectedCategory === 'all' || asset.category === selectedCategory;
-    const matchesSearch = asset.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                          asset.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                          asset.tokenSymbol.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesCat && matchesSearch;
+    const q = (searchQuery || '').toLowerCase();
+    const titleMatch = (asset.title || '').toLowerCase().includes(q);
+    const locMatch = (asset.location || '').toLowerCase().includes(q);
+    const symMatch = (asset.tokenSymbol || '').toLowerCase().includes(q);
+    return matchesCat && (titleMatch || locMatch || symMatch);
   });
 
   return (
@@ -120,7 +121,11 @@ export const AssetCatalog: React.FC<AssetCatalogProps> = ({
       {/* Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredAssets.map((asset) => {
-          const progressPercent = Math.min(100, Math.round((asset.tokensSold / asset.totalSupply) * 100));
+          const supply = asset.totalSupply || (asset as any).totalTokens || 1;
+          const sold = asset.tokensSold || 0;
+          const progressPercent = Math.min(100, Math.round((sold / supply) * 100));
+          const valuationUSD = asset.totalValuationUSD ?? (asset as any).totalValueUSD ?? 0;
+          const tokenPrice = asset.tokenPriceUSD ?? (supply > 0 ? Math.round(valuationUSD / supply) : 0);
 
           return (
             <div
@@ -188,14 +193,14 @@ export const AssetCatalog: React.FC<AssetCatalogProps> = ({
                     }`}>
                       <p className={`text-[10px] font-vazir ${isDarkMode ? 'text-neutral-400' : 'text-neutral-500'}`}>{t.totalValuation}</p>
                       <p className={`text-sm font-bold font-mono mt-0.5 ${isDarkMode ? 'text-white' : 'text-neutral-900'}`}>
-                        ${asset.totalValuationUSD.toLocaleString()}
+                        ${valuationUSD.toLocaleString()}
                       </p>
                     </div>
                     <div className={`p-2.5 rounded-xl border ${
                       isDarkMode ? 'bg-neutral-900/60 border-neutral-800' : 'bg-neutral-50 border-neutral-200'
                     }`}>
                       <p className={`text-[10px] font-vazir ${isDarkMode ? 'text-neutral-400' : 'text-neutral-500'}`}>{t.tokenPrice}</p>
-                      <p className="text-sm font-bold text-[#F7931A] font-mono mt-0.5">${asset.tokenPriceUSD}</p>
+                      <p className="text-sm font-bold text-[#F7931A] font-mono mt-0.5">${tokenPrice}</p>
                     </div>
                   </div>
 

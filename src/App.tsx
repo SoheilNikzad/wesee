@@ -72,7 +72,42 @@ export function App() {
           const snap = await getDocs(collection(db, 'assets'));
           if (!snap.empty) {
             const list: RWAAsset[] = [];
-            snap.forEach(d => list.push(d.data() as RWAAsset));
+            snap.forEach(d => {
+              const raw = d.data() as any;
+              const valuation = Number(raw.totalValuationUSD ?? raw.totalValueUSD ?? 0);
+              const supply = Number(raw.totalSupply ?? raw.totalTokens ?? 1000);
+              const price = Number(raw.tokenPriceUSD ?? (supply > 0 ? Math.max(1, Math.round(valuation / supply)) : 20));
+              const sold = Number(raw.tokensSold ?? 0);
+
+              list.push({
+                id: raw.id || d.id,
+                title: raw.title || 'دارایی دیجیتال بدون نام',
+                category: raw.category || 'real-estate',
+                categoryLabel: raw.categoryLabel || (raw.category === 'gold' ? 'طلا و فلزات' : 'املاک و مستغلات'),
+                location: raw.location || 'ایران',
+                totalValuationUSD: valuation,
+                totalValuationIRR: Number(raw.totalValuationIRR ?? (valuation * 60000)),
+                tokenizedPercentage: Number(raw.tokenizedPercentage ?? 100),
+                tokenPriceUSD: price,
+                totalSupply: supply,
+                tokensSold: sold,
+                expectedAPY: Number(raw.expectedAPY ?? 15),
+                rentalYield: raw.rentalYield ? Number(raw.rentalYield) : undefined,
+                network: (raw.network === 'bsc' ? 'bsc' : 'polygon') as BlockchainNetwork,
+                tokenSymbol: raw.tokenSymbol || 'WSEE',
+                tokenName: raw.tokenName || raw.title || 'WeSee Token',
+                contractAddress: raw.contractAddress || raw.smartContractAddress,
+                imageUrl: raw.imageUrl || 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=800&q=80',
+                description: raw.description || '',
+                documents: Array.isArray(raw.documents) ? raw.documents : [],
+                status: (raw.status || 'active') as any,
+                complianceStatus: (raw.complianceStatus || 'approved') as any,
+                complianceLicenseId: raw.complianceLicenseId || raw.complianceLicenseNumber,
+                rejectionReason: raw.rejectionReason,
+                minInvestmentUSD: Number(raw.minInvestmentUSD ?? price),
+                issuerName: raw.issuerName
+              });
+            });
             if (list.length > 0) {
               setAssets(list);
             }

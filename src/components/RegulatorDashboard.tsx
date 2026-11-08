@@ -159,7 +159,7 @@ export const RegulatorDashboard: React.FC<RegulatorDashboardProps> = ({
                     <p className={`text-xs flex items-center gap-2 ${isDarkMode ? 'text-neutral-400' : 'text-neutral-600'}`}>
                       <span>موقعیت: {asset.location}</span>
                       <span>•</span>
-                      <span>ارزش: ${asset.totalValuationUSD.toLocaleString()}</span>
+                      <span>ارزش: ${(asset.totalValuationUSD ?? (asset as any).totalValueUSD ?? 0).toLocaleString()}</span>
                     </p>
 
                     {/* REAL Legal documents list with actual file download */}
